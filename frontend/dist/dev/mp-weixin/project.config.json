@@ -1,0 +1,59 @@
+{
+  "description": "项目配置文件。",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": false,
+    "minified": false,
+    "newFeature": true,
+    "bigPackageSizeSupport": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "",
+  "appid": "touristappid",
+  "projectname": "",
+  "condition": {
+    "search": {
+      "current": -1,
+      "list": []
+    },
+    "conversation": {
+      "current": -1,
+      "list": []
+    },
+    "game": {
+      "current": -1,
+      "list": []
+    },
+    "miniprogram": {
+      "current": 0,
+      "list": [
+        {
+          "name": "启动页为登录页",
+          "query": "",
+          "id": 0,
+          "pathName": "pages/login/login"
+        },
+        {
+          "name": "启动页为首页",
+          "id": 1,
+          "pathName": "pages/index/index"
+        },
+        {
+          "name": "个人资料编辑页",
+          "id": 2,
+          "pathName": "pages/profile/edit"
+        },
+        {
+          "name": "聊天页",
+          "query": "userId=1&name=测试用户&avatar=",
+          "id": 3,
+          "pathName": "pages/chat/chat"
+        }
+      ]
+    }
+  }
+}

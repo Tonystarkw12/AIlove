@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>“AI:爱” App 核心功能原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .main-gradient {
+            background: linear-gradient(135deg, #fce3f3, #e8e6f8, #d9f3fd);
+        }
+        .card-gradient {
+            background: linear-gradient(to top right, rgba(255,255,255,0.8), rgba(255,255,255,0.5));
+        }
+        .btn-gradient {
+            background: linear-gradient(45deg, #ff81ae, #a289f8);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(255, 129, 174, 0.4);
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(162, 137, 248, 0.5);
+        }
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff81ae;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="main-gradient">
+
+    <div id="app-container" class="max-w-md mx-auto min-h-screen bg-white/50 shadow-2xl flex flex-col">
+        
+        <!-- Header -->
+        <header class="text-center p-4 shadow-md bg-white/70">
+            <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500">AI:爱</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-4 overflow-y-auto">
+
+            <!-- Profile Writer Section -->
+            <div id="profile-writer-section" class="card-gradient p-4 rounded-xl shadow-lg mb-6">
+                 <h2 class="font-bold text-lg text-gray-700 mb-2">打造你的专属名片</h2>
+                 <p class="text-sm text-gray-600 mb-3">输入几个关键词，让AI帮你写出最吸引人的个人简介！</p>
+                 <input id="profile-keywords" type="text" placeholder="例：喜欢徒步、科幻电影、撸猫" class="w-full p-2 border border-gray-300 rounded-lg mb-3">
+                 <button id="generate-bio-btn" class="w-full btn-gradient text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> ✨ AI帮你写资料
+                </button>
+                 <div id="bio-result" class="mt-3 p-3 bg-white/70 rounded-lg text-gray-700 text-sm hidden"></div>
+            </div>
+
+            <!-- Match Card -->
+            <div id="match-card" class="card-gradient p-4 rounded-xl shadow-lg">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop" class="w-full h-80 object-cover rounded-lg shadow-md">
+                    <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/70 to-transparent rounded-b-lg">
+                        <h2 class="text-white text-2xl font-bold">思语, 24</h2>
+                        <p class="text-white/90 text-sm">设计师 | 热爱生活与艺术</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-2">
+                    <h3 class="font-semibold text-gray-700">个人简介</h3>
+                    <p id="match-bio" class="text-gray-600 text-sm mt-1">沉迷于用画笔和代码创造美。一个人的时候喜欢在美术馆里寻找灵感，也享受和朋友一起在live house里释放热情。相信生活需要一些不期而遇的惊喜，期待遇到一个能分享彼此世界的有趣灵魂。</p>
+                </div>
+                
+                <div id="user-profile" class="hidden">
+                    <h3 class="font-semibold text-gray-700">我的简介</h3>
+                    <p id="my-bio">一个热爱探索的程序员，周末喜欢背着包去山里徒步，晚上则宅家看科幻电影。坚信代码和自然风光是世界上最美妙的两样东西。希望能找到一个可以一起看星星、聊宇宙的女孩。</p>
+                </div>
+
+                <div class="mt-4 grid grid-cols-1 gap-3">
+                    <button onclick="showGeminiFeature('report')" class="btn-gradient text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-file-alt mr-2"></i> 查看AI分析报告</button>
+                    <button onclick="showGeminiFeature('icebreaker')" class="btn-gradient text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-comments mr-2"></i> ✨ 获取专属破冰话题</button>
+                    <button onclick="showGeminiFeature('date')" class="btn-gradient text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-map-marked-alt mr-2"></i> ✨ 规划首次约会</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 modal-bg items-center justify-center hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-sm p-6 m-4 relative transform transition-all duration-300 scale-95 opacity-0">
+            <button onclick="closeModal()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            <h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-4"></h3>
+            <div id="modal-content">
+                <div class="flex justify-center items-center h-24">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        const bioResult = document.getElementById('bio-result');
+
+        // --- Gemini API Call Logic ---
+        async function callGemini(prompt) {
+            // NOTE: An API key is not required for gemini-2.0-flash.
+            // For other models, you should get a key from Google AI Studio.
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                     throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Unexpected API response structure:", result);
+                    // Check for blocked content message
+                    if (result.promptFeedback && result.promptFeedback.blockReason) {
+                        return `抱歉，请求因“${result.promptFeedback.blockReason}”被阻止。请修改提示后重试。`;
+                    }
+                    return "抱歉，AI暂时无法回应，请稍后再试。";
+                }
+
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                return "发生网络错误，请检查您的连接。";
+            }
+        }
+
+        // --- Feature Implementations ---
+
+        document.getElementById('generate-bio-btn').addEventListener('click', async () => {
+            const keywords = document.getElementById('profile-keywords').value;
+            if (!keywords) {
+                alert("请输入一些关键词哦！");
+                return;
+            }
+            bioResult.innerHTML = '<div class="flex justify-center"><div class="loader"></div></div>';
+            bioResult.classList.remove('hidden');
+
+            const prompt = `你是一位风趣幽默的约会app个人简介写作高手。请根据以下关键词，写一段大约50字，吸引人、真诚且富有魅力的个人简介。请用中文回答。关键词：${keywords}`;
+            const generatedBio = await callGemini(prompt);
+            bioResult.innerHTML = generatedBio.replace(/\n/g, '<br>');
+        });
+
+
+        async function showGeminiFeature(type) {
+            openModal();
+            let prompt = '';
+            const myBio = document.getElementById('my-bio').innerText;
+            const matchBio = document.getElementById('match-bio').innerText;
+
+            switch (type) {
+                case 'report':
+                    modalTitle.innerText = 'AI 智能分析报告';
+                    prompt = `你是一位温暖且富有洞察力的情感专家。请分析以下两位用户的个人简介，写一段简短（约100字）且充满鼓励的匹配分析报告，重点突出他们潜在的共同点和性格上的互补之处。请用像朋友一样的亲切口吻，并使用中文回答。\n\n我的简介：${myBio}\n\n对方的简介：${matchBio}`;
+                    break;
+                case 'icebreaker':
+                    modalTitle.innerText = '✨ 专属破冰话题';
+                    prompt = `你是一位风趣机智的搭讪大师。根据以下两位用户的简介，为我生成3个独特、有趣且不尴尬的开场白或提问，可以直接发给对方。请确保问题是开放性的，能引发对方的聊天欲望。请用中文回答。\n\n我的简介：${myBio}\n\n对方的简介：${matchBio}`;
+                    break;
+                case 'date':
+                    modalTitle.innerText = '✨ 首次约会规划';
+                    prompt = `你是一位富有创意的约会策划师。根据以下两位用户的简介，推断出他们可能共同的兴趣点，然后策划一个独特、有趣且适合初次见面的约会方案。方案应包含一个主题和简要的活动描述（约100字）。请用充满吸引力的口吻，并使用中文回答。\n\n我的简介：${myBio}\n\n对方的简介：${matchBio}`;
+                    break;
+            }
+
+            const result = await callGemini(prompt);
+            modalContent.innerHTML = `<div class="text-gray-700 text-sm whitespace-pre-wrap">${result}</div>`;
+        }
+
+        // --- Modal Controls ---
+        function openModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Trigger reflow to apply transition
+            setTimeout(() => {
+                const modalBox = modal.querySelector('div');
+                modalBox.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modalBox = modal.querySelector('div');
+            modalBox.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                // Reset content for next use
+                modalTitle.innerText = '';
+                modalContent.innerHTML = '<div class="flex justify-center items-center h-24"><div class="loader"></div></div>';
+            }, 300);
+        }
+    </script>
+</body>
+</html>

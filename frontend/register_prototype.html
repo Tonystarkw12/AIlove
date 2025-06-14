@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>注册页面原型</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .mobile-preview {
+            width: 375px;
+            height: 812px; /* 适配更多内容 */
+            background-color: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 50px 20px 30px;
+            text-align: center;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .register-form {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px; /* 调整间距 */
+            flex-grow: 1;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: calc(100% - 20px);
+            padding: 14px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #6e8efb;
+            box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.2);
+            outline: none;
+        }
+
+        .register-button {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+            margin-top: 10px;
+        }
+
+        .register-button:hover {
+            background: linear-gradient(135deg, #5a78e6, #9260cf);
+        }
+        .register-button:active {
+            transform: scale(0.98);
+        }
+
+        .footer-links {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .footer-links a {
+            color: #6e8efb;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: #5a78e6;
+        }
+
+        .design-notes {
+            flex-basis: 400px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            max-height: 812px;
+            overflow-y: auto;
+        }
+
+        .design-notes h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 20px;
+            border-bottom: 2px solid #6e8efb;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .design-notes ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .design-notes li {
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+        .design-notes li strong {
+            color: #333;
+            font-weight: 600;
+        }
+        .terms {
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .terms a {
+            color: #6e8efb;
+            text-decoration: none;
+        }
+
+        @media (max-width: 800px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .design-notes {
+                width: 90%;
+                max-width: 375px;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="mobile-preview">
+            <div class="header">
+                <h1>创建账户</h1>
+                <p>加入我们，开启新体验</p>
+            </div>
+            <div class="register-form">
+                <div class="input-group">
+                    <label for="fullname">昵称</label>
+                    <input type="text" id="fullname" name="fullname" placeholder="请输入您的昵称">
+                </div>
+                <div class="input-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" name="email" placeholder="请输入您的邮箱地址">
+                </div>
+                <div class="input-group">
+                    <label for="password">设置密码</label>
+                    <input type="password" id="password" name="password" placeholder="请输入密码 (至少8位)">
+                </div>
+                <div class="input-group">
+                    <label for="confirm-password">确认密码</label>
+                    <input type="password" id="confirm-password" name="confirm-password" placeholder="请再次输入密码">
+                </div>
+                <button class="register-button" id="registerBtn">注册</button>
+                <div class="terms">
+                    注册即表示您同意我们的 <a href="#">服务条款</a> 和 <a href="#">隐私政策</a>.
+                </div>
+                <div class="footer-links">
+                    <a href="login_prototype.html" id="loginLink">已有账户? 直接登录</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="design-notes">
+            <h2>注册页面设计说明</h2>
+            <ul>
+                <li><strong>整体风格:</strong> 与登录页面保持一致的视觉风格，确保品牌统一性。</li>
+                <li><strong>头部区域:</strong> 标题更改为“创建账户”，副标题调整为“加入我们，开启新体验”。</li>
+                <li><strong>表单字段:</strong>
+                    <ul>
+                        <li><strong>昵称:</strong> 供用户设置个性化名称。</li>
+                        <li><strong>邮箱:</strong> 用于账户验证和通信。</li>
+                        <li><strong>设置密码:</strong> 提示用户密码长度要求。</li>
+                        <li><strong>确认密码:</strong> 确保用户正确输入密码。</li>
+                    </ul>
+                </li>
+                <li><strong>注册按钮:</strong> 样式与登录按钮一致，文本为“注册”。</li>
+                <li><strong>服务条款:</strong> 在注册按钮下方添加服务条款和隐私政策的链接提示。</li>
+                <li><strong>底部链接:</strong> 提供返回登录页面的链接“已有账户? 直接登录”。</li>
+                <li><strong>交互提示:</strong>
+                    <ul>
+                        <li>输入框焦点反馈。</li>
+                        <li>注册按钮点击后进行基本校验并提示（例如密码是否一致，字段是否为空）。</li>
+                    </ul>
+                </li>
+                 <li><strong>移动端优化:</strong> 预览高度调整为 812px 以容纳更多表单项。</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (!fullname || !email || !password || !confirmPassword) {
+                alert('请填写所有必填项！');
+                return;
+            }
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致！');
+                return;
+            }
+            if (password.length < 8) {
+                alert('密码长度至少为8位！');
+                return;
+            }
+            // 简单邮箱格式校验
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert('请输入有效的邮箱地址！');
+                return;
+            }
+
+            alert('注册按钮被点击！\\n昵称: ' + fullname + '\\n邮箱: ' + email + '\\n密码: [已隐藏]');
+        });
+
+        // loginLink 的跳转由 a 标签的 href 实现，无需额外 JS
+    </script>
+</body>
+</html>
