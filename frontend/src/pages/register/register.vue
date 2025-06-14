@@ -63,13 +63,14 @@
 
 <script setup>
 import { ref } from 'vue';
+import { API_BASE_URL } from '../../config'; // Import from central config
 
 const nickname = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Correct API base URL
+// const API_BASE_URL = 'http://localhost:3000/api'; // No longer needed here
 
 const handleRegister = async () => {
   if (!nickname.value || !email.value || !password.value || !confirmPassword.value) {

@@ -37,11 +37,12 @@
 
 <script setup>
 import { ref } from 'vue';
+import { API_BASE_URL } from '../../config'; // Import from central config
 
 const email = ref(''); // Changed from username
 const password = ref('');
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Correct API base URL
+// const API_BASE_URL = 'http://localhost:3000/api'; // No longer needed here
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
