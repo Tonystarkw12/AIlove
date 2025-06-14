@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { pool } = require('../server'); // Assuming server.js exports pool
+const pool = require('../db'); // Import pool from db.js
 const { v4: uuidv4 } = require('uuid'); // For generating user_id if not handled by DB default
 const { updateRecommendationsForUser } = require('../services/recommendationService');
 

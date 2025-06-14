@@ -1,4 +1,4 @@
-const { pool } = require('../server'); // Assuming server.js exports pool
+// const pool = require('../db'); // We will re-require it inside the function for testing
 const axios = require('axios');
 const geolib = require('geolib'); // For geo-distance calculations if needed beyond geohash
 
@@ -12,10 +12,15 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL;
  * @param {string} userId - The ID of the user for whom to update recommendations.
  */
 async function updateRecommendationsForUser(userId) {
+    const pool = require('../db'); // Re-require pool here for testing
     console.log(`Starting recommendation update for user: ${userId}`);
     let client;
 
     try {
+        if (!pool || typeof pool.connect !== 'function') {
+            console.error('CRITICAL: pool is not available or not a Pool object in recommendationService!', pool);
+            throw new Error('Database pool is not configured correctly in recommendationService.');
+        }
         client = await pool.connect();
         await client.query('BEGIN');
 
@@ -127,31 +132,40 @@ async function updateRecommendationsForUser(userId) {
         for (const candidate of candidates) {
             if (candidate.user_id === userId) continue; // Should be filtered by query, but double check
 
-            const prompt = constructGeminiPrompt(currentUser, candidate);
-            // console.log(`Prompt for candidate ${candidate.user_id}:\n${prompt}`); // For debugging
+            const systemPrompt = "你是一位顶尖的婚恋匹配专家。请基于两位用户的资料进行深度匹配分析，并以JSON格式返回结果。结果必须包含字段：'matchScore' (0-100整数), 'matchReason' (50字内字符串), 'icebreakers' (3个字符串数组的破冰话题)。";
+            const userPrompt = constructOpenAIUserPrompt(currentUser, candidate);
+            // console.log(`User prompt for candidate ${candidate.user_id}:\n${userPrompt}`); // For debugging
 
             try {
-                const geminiResponse = await axios.post(`${GEMINI_API_BASE_URL}/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        // Ensure Gemini tries to return JSON
-                        response_mime_type: "application/json",
+                const openAIResponse = await axios.post(
+                    `${GEMINI_API_BASE_URL}/v1/chat/completions`, // Corrected URL
+                    {
+                        model: GEMINI_MODEL, // Your specified model name
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: userPrompt }
+                        ],
+                        response_format: { type: "json_object" } // Request JSON output
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${GEMINI_API_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
                     }
-                });
+                );
                 
-                // console.log("Raw Gemini Response:", JSON.stringify(geminiResponse.data, null, 2));
+                // console.log("Raw OpenAI Response:", JSON.stringify(openAIResponse.data, null, 2));
 
-                if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates[0].content) {
-                    const rawJson = geminiResponse.data.candidates[0].content.parts[0].text;
-                    // console.log("Raw JSON from Gemini:", rawJson);
+                if (openAIResponse.data && openAIResponse.data.choices && openAIResponse.data.choices[0].message && openAIResponse.data.choices[0].message.content) {
+                    const rawJson = openAIResponse.data.choices[0].message.content;
+                    // console.log("Raw JSON from OpenAI:", rawJson);
                     
-                    // Attempt to parse the JSON, which might be wrapped in markdown
                     let matchData;
                     try {
-                        const cleanedJson = rawJson.replace(/^```json\s*|```\s*$/g, ''); // Remove markdown fences
-                        matchData = JSON.parse(cleanedJson);
+                        matchData = JSON.parse(rawJson);
                     } catch (parseError) {
-                        console.error(`Error parsing JSON from Gemini for candidate ${candidate.user_id}: ${parseError.message}. Raw text: ${rawJson}`);
+                        console.error(`Error parsing JSON from AI for candidate ${candidate.user_id}: ${parseError.message}. Raw text: ${rawJson}`);
                         continue; // Skip this candidate
                     }
 
@@ -166,16 +180,16 @@ async function updateRecommendationsForUser(userId) {
                         });
                         console.log(`Successfully processed AI match for candidate ${candidate.user_id}. Score: ${matchData.matchScore}`);
                     } else {
-                        console.warn(`Gemini response for candidate ${candidate.user_id} did not have the expected structure. Data:`, matchData);
+                        console.warn(`AI response for candidate ${candidate.user_id} did not have the expected structure. Data:`, matchData);
                     }
                 } else {
-                     console.warn(`No valid content in Gemini response for candidate ${candidate.user_id}. Response:`, JSON.stringify(geminiResponse.data, null, 2));
+                     console.warn(`No valid content in AI response for candidate ${candidate.user_id}. Response:`, JSON.stringify(openAIResponse.data, null, 2));
                 }
             } catch (aiError) {
                 if (aiError.response) {
-                    console.error(`Error calling Gemini API for candidate ${candidate.user_id}: ${aiError.response.status}`, aiError.response.data);
+                    console.error(`Error calling AI API for candidate ${candidate.user_id}: ${aiError.response.status}`, aiError.response.data);
                 } else {
-                    console.error(`Error calling Gemini API for candidate ${candidate.user_id}: ${aiError.message}`);
+                    console.error(`Error calling AI API for candidate ${candidate.user_id}: ${aiError.message}`);
                 }
                 // Continue to next candidate even if one AI call fails
             }
@@ -233,7 +247,7 @@ async function updateRecommendationsForUser(userId) {
  * @param {object} candidateUser - The profile of the candidate user.
  * @returns {string} The prompt string.
  */
-function constructGeminiPrompt(currentUser, candidateUser) {
+function constructOpenAIUserPrompt(currentUser, candidateUser) {
     // Helper to safely access and format Q&A
     const getQA = (q_and_a, key, defaultVal = "未提供") => {
         if (q_and_a && typeof q_and_a === 'object' && q_and_a[key]) {
@@ -270,13 +284,10 @@ function constructGeminiPrompt(currentUser, candidateUser) {
 - 理想的周末: ${getQA(candidateUser.q_and_a, 'ideal_weekend')}
 - 关于宠物: ${getQA(candidateUser.q_and_a, 'about_pets')}
 
-请根据以上信息，以JSON格式返回你的分析结果，必须包含以下字段：
-1. "matchScore": 一个从0到100的整数，代表整体匹配度。较高的分数表示更强的匹配。
-2. "matchReason": 一段50字以内的字符串，用充满吸引力的语言总结你们为什么匹配。
-3. "icebreakers": 一个包含3个字符串的数组，每个都是根据你们的共同点或有趣差异生成的破冰话题。`;
+请严格按照之前系统提示中描述的JSON格式返回你的分析。`;
 }
 
 module.exports = {
     updateRecommendationsForUser,
-    // Potentially export constructGeminiPrompt if needed for testing
+    // Potentially export constructOpenAIUserPrompt if needed for testing
 };

@@ -1,0 +1,21 @@
+{
+    "git.ignoreLimitWarning": true,
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true
+                }
+            },
+            "previewLimit": 50,
+            "server": "ep-ancient-bread-a1fr0w37-pooler.ap-southeast-1.aws.neon.tech",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "neon",
+            "database": "neondb",
+            "username": "neondb_owner",
+            "password": "npg_Wl8O3fdtkFTD",
+            "group": "neon"
+        }
+    ]
+}

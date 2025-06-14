@@ -102,7 +102,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 
-const API_BASE_URL = 'https://zkbdeainnjcy.sealoshzh.site';
+const API_BASE_URL = 'http://localhost:3000';
 let authToken = '';
 
 const profile = reactive({

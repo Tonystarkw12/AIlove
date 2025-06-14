@@ -69,7 +69,7 @@ const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 
-const API_BASE_URL = 'https://zkbdeainnjcy.sealoshzh.site';
+const API_BASE_URL = 'http://localhost:3000/api'; // Correct API base URL
 
 const handleRegister = async () => {
   if (!nickname.value || !email.value || !password.value || !confirmPassword.value) {

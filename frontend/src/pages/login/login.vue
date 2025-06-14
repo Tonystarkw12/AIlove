@@ -41,7 +41,7 @@ import { ref } from 'vue';
 const email = ref(''); // Changed from username
 const password = ref('');
 
-const API_BASE_URL = 'https://zkbdeainnjcy.sealoshzh.site';
+const API_BASE_URL = 'http://localhost:3000'; // Update with your actual API base URL
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {

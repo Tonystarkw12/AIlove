@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { Pool } = require('pg');
+const pool = require('./db'); // Import the pool from db.js
 const http = require('http'); // Required for WebSocket server
 const path = require('path'); // Required for static file serving
 
@@ -17,26 +17,7 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Database Connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Required for NeonDB, adjust if your DB has different SSL requirements
-  }
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    return console.error('Error acquiring client', err.stack);
-  }
-  client.query('SELECT NOW()', (err, result) => {
-    release();
-    if (err) {
-      return console.error('Error executing query', err.stack);
-    }
-    console.log('Successfully connected to PostgreSQL. Current time from DB:', result.rows[0].now);
-  });
-});
+// Database Connection is now handled in db.js
 
 // Basic Route
 app.get('/', (req, res) => {
@@ -68,4 +49,4 @@ server.listen(port, () => { // Use server.listen instead of app.listen for WebSo
   console.log(`Server (HTTP & WebSocket) listening on port ${port}`);
 });
 
-module.exports = { app, pool, server, wss, sendMessageToUser }; // Export server, pool, and WebSocket utilities
+module.exports = { app, server, wss, sendMessageToUser }; // Export server and WebSocket utilities (pool is no longer defined here)

@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
-const API_BASE_URL = "https://zkbdeainnjcy.sealoshzh.site";
+const API_BASE_URL = "http://localhost:3000"; // Update with your actual API base URL
 const maxPhotos = 6;
 const _sfc_main = {
   __name: "edit",
