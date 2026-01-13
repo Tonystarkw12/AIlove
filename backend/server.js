@@ -29,11 +29,19 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const recommendationRoutes = require('./routes/recommendations');
 const chatRoutes = require('./routes/chat');
+const mapRoutes = require('./routes/map'); // Phase 1: 地理位置路由
+const tasksRoutes = require('./routes/tasks'); // Phase 2: 约会任务路由
+const spotsRoutes = require('./routes/spots'); // Phase 2: 约会地点路由
+const rewardsRoutes = require('./routes/rewards'); // Phase 4: 积分奖励路由
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/map', mapRoutes); // Phase 1: 地理位置 API
+app.use('/api/tasks', tasksRoutes); // Phase 2: 约会任务 API
+app.use('/api/spots', spotsRoutes); // Phase 2: 约会地点 API
+app.use('/api/rewards', rewardsRoutes); // Phase 4: 积分奖励 API
 
 // WebSocket Server Setup
 const { initializeWebSocketServer, sendMessageToUser } = require('./services/websocketService');

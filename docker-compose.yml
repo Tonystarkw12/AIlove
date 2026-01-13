@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Exposes backend's port 3000 to host's port 3000
+    volumes:
+      - ./backend:/usr/src/app/backend # Mounts backend code for development (optional for production)
+      - /usr/src/app/backend/node_modules # Excludes node_modules from being overwritten by host mount
+    env_file:
+      - ./backend/.env # Loads environment variables from backend/.env
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80" # Exposes Nginx (port 80 in container) to host's port 8080
+    depends_on:
+      - backend
+    volumes:
+      # We need to add an Nginx configuration file to proxy API requests
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro # Mount custom Nginx config
+      # For development, you might mount your frontend source code
+      # But for production, the build from Dockerfile is usually preferred.
+      # - ./frontend/src:/usr/src/app/frontend/src 
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
