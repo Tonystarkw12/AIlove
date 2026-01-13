@@ -11,7 +11,7 @@
       }
     },
     {
-      "path": "pages/register/register",
+      "path": "pages/login/register",
       "style": {
         "navigationStyle": "custom",
         "app-plus": {
@@ -59,6 +59,16 @@
           "animationDuration": 300
         }
       }
+    },
+    {
+      "path": "pages/community/love-wall",
+      "style": {
+        "navigationStyle": "custom",
+        "app-plus": {
+          "animationType": "fade-in",
+          "animationDuration": 300
+        }
+      }
     }
   ],
   "globalStyle": {
@@ -83,10 +93,16 @@
         "text": "首页"
       },
       {
-        "pagePath": "pages/map/index", // Phase 1: 地图 Tab
+        "pagePath": "pages/map/index",
         "iconPath": "static/tabbar/map.png",
         "selectedIconPath": "static/tabbar/map_active.png",
         "text": "地图"
+      },
+      {
+        "pagePath": "pages/community/love-wall",
+        "iconPath": "static/tabbar/love.svg",
+        "selectedIconPath": "static/tabbar/love_active.svg",
+        "text": "甜蜜墙"
       },
       {
         "pagePath": "pages/user/user",

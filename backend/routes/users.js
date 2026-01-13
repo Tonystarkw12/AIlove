@@ -1,11 +1,12 @@
 const express = require('express');
-const { pool } = require('../server');
+const pool = require('../db'); // 直接从db.js导入pool
 const authenticateToken = require('../middleware/authenticateToken');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { updateRecommendationsForUser } = require('../services/recommendationService');
+const { assignPokemonAvatar } = require('../services/pokemonMapper');
 
 const router = express.Router();
 
@@ -434,5 +435,286 @@ const uuidValidate = (uuid) => {
     return uuidRegex.test(uuid);
 };
 
+/**
+ * GET /api/users/me/status
+ * 获取当前用户状态（用于匹配前检查）
+ * 返回：资料完整度、积分、今日匹配次数、VIP等级等信息
+ */
+router.get('/me/status', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+
+        // 获取用户完整信息
+        const userResult = await pool.query(
+            `SELECT
+                user_id,
+                nickname,
+                gender,
+                birth_date,
+                points,
+                level,
+                vip_level,
+                vip_expires_at,
+                profile_completeness,
+                daily_match_count,
+                last_match_date,
+                pokemon_avatar_id,
+                photos,
+                tags,
+                values_description
+            FROM users
+            WHERE user_id = $1`,
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                error: {
+                    code: 'USER_NOT_FOUND',
+                    message: '用户不存在'
+                }
+            });
+        }
+
+        const user = userResult.rows[0];
+
+        // 检查是否是新的一天（重置每日匹配次数）
+        const today = new Date().toISOString().split('T')[0];
+        if (user.last_match_date !== today) {
+            await pool.query(
+                `UPDATE users
+                 SET daily_match_count = 0,
+                     last_match_date = $1
+                 WHERE user_id = $2`,
+                [today, userId]
+            );
+            user.daily_match_count = 0;
+            user.last_match_date = today;
+        }
+
+        // 检查VIP是否过期
+        let isVip = false;
+        if (user.vip_expires_at) {
+            const now = new Date();
+            const expiresAt = new Date(user.vip_expires_at);
+            isVip = expiresAt > now;
+        }
+
+        // 计算年龄
+        let age = null;
+        if (user.birth_date) {
+            const birthDate = new Date(user.birth_date);
+            const todayDate = new Date();
+            age = todayDate.getFullYear() - birthDate.getFullYear();
+        }
+
+        // 判断资料是否完整（完整度 >= 60分）
+        const isProfileComplete = user.profile_completeness >= 60;
+
+        // 每次匹配消耗50积分
+        const pointsPerMatch = 50;
+        const hasEnoughPoints = user.points >= pointsPerMatch;
+
+        // 构建响应
+        const status = {
+            userId: user.user_id,
+            nickname: user.nickname,
+            gender: user.gender,
+            age: age,
+            level: user.level,
+            vipLevel: user.vip_level,
+            isVip: isVip,
+            vipExpiresAt: user.vip_expires_at,
+
+            // 资料完整度
+            profileCompleteness: user.profile_completeness,
+            isProfileComplete: isProfileComplete,
+
+            // 积分信息
+            points: user.points,
+            pointsPerMatch: pointsPerMatch,
+            hasEnoughPoints: hasEnoughPoints,
+
+            // 匹配次数
+            dailyMatchCount: user.daily_match_count,
+            lastMatchDate: user.last_match_date,
+
+            // 宝可梦头像
+            pokemonAvatarId: user.pokemon_avatar_id,
+
+            // 其他信息
+            hasTags: user.tags && user.tags.length > 0,
+            hasValuesDescription: !!user.values_description,
+            photoCount: user.photos ? user.photos.length : 0,
+
+            // 提示信息
+            message: isProfileComplete
+                ? (hasEnoughPoints
+                    ? '可以开始匹配'
+                    : '积分不足，请完成每日任务或充值')
+                : '请先完善训练师档案'
+        };
+
+        res.status(200).json(status);
+
+    } catch (error) {
+        console.error('Get user status error:', error);
+        res.status(500).json({
+            error: {
+                code: 'INTERNAL_SERVER_ERROR',
+                message: '获取用户状态失败'
+            }
+        });
+    }
+});
+
+/**
+ * POST /api/users/me/match
+ * 执行匹配操作（消耗积分）
+ */
+router.post('/me/match', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+
+        // 获取用户当前状态
+        const userResult = await pool.query(
+            `SELECT
+                points,
+                level,
+                profile_completeness,
+                daily_match_count,
+                last_match_date,
+                pokemon_avatar_id
+            FROM users
+            WHERE user_id = $1`,
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                error: {
+                    code: 'USER_NOT_FOUND',
+                    message: '用户不存在'
+                }
+            });
+        }
+
+        const user = userResult.rows[0];
+
+        // 检查资料完整度
+        if (user.profile_completeness < 60) {
+            return res.status(400).json({
+                error: {
+                    code: 'PROFILE_INCOMPLETE',
+                    message: '请先完善训练师档案',
+                    profileCompleteness: user.profile_completeness
+                }
+            });
+        }
+
+        // 检查积分
+        const pointsPerMatch = 50;
+        if (user.points < pointsPerMatch) {
+            return res.status(400).json({
+                error: {
+                    code: 'INSUFFICIENT_POINTS',
+                    message: '积分不足',
+                    currentPoints: user.points,
+                    requiredPoints: pointsPerMatch
+                }
+            });
+        }
+
+        // 扣除积分
+        await pool.query(
+            `UPDATE users
+             SET points = points - $1,
+                 daily_match_count = daily_match_count + 1,
+                 last_match_date = CURRENT_DATE
+             WHERE user_id = $2`,
+            [pointsPerMatch, userId]
+        );
+
+        // 返回成功响应
+        res.status(200).json({
+            message: '匹配成功',
+            pointsDeducted: pointsPerMatch,
+            remainingPoints: user.points - pointsPerMatch,
+            dailyMatchCount: user.daily_match_count + 1
+        });
+
+    } catch (error) {
+        console.error('Match operation error:', error);
+        res.status(500).json({
+            error: {
+                code: 'INTERNAL_SERVER_ERROR',
+                message: '匹配操作失败'
+            }
+        });
+    }
+});
+
+// POST /api/users/me/assign-pokemon - 分配宝可梦头像
+router.post('/me/assign-pokemon', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+
+        // 获取用户的性格标签
+        const userResult = await pool.query(
+            `SELECT tags, pokemon_avatar_id FROM users WHERE user_id = $1`,
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                error: {
+                    code: 'NOT_FOUND',
+                    message: '用户不存在'
+                }
+            });
+        }
+
+        const user = userResult.rows[0];
+        const tags = user.tags || [];
+
+        // 如果已经有宝可梦头像，直接返回
+        if (user.pokemon_avatar_id) {
+            return res.status(200).json({
+                message: '已有宝可梦头像',
+                pokemonAvatarId: user.pokemon_avatar_id,
+                avatarUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${user.pokemon_avatar_id}.png`
+            });
+        }
+
+        // 使用性格标签分配宝可梦
+        const pokemonData = assignPokemonAvatar(tags);
+
+        // 更新用户的宝可梦头像ID
+        await pool.query(
+            `UPDATE users SET pokemon_avatar_id = $1 WHERE user_id = $2`,
+            [pokemonData.avatarId, userId]
+        );
+
+        res.status(200).json({
+            message: '宝可梦头像分配成功',
+            pokemon: {
+                id: pokemonData.avatarId,
+                name: pokemonData.pokemonName,
+                type: pokemonData.pokemonType,
+                avatarUrl: pokemonData.avatarUrl,
+                matchedTag: pokemonData.matchedTag
+            }
+        });
+
+    } catch (error) {
+        console.error('Assign Pokemon avatar error:', error);
+        res.status(500).json({
+            error: {
+                code: 'INTERNAL_SERVER_ERROR',
+                message: '分配宝可梦头像失败'
+            }
+        });
+    }
+});
 
 module.exports = router;

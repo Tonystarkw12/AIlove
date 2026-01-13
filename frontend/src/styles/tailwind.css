@@ -1,0 +1,88 @@
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 宝可梦风格全局样式 */
+
+/* GameBoy 复古风格边框 */
+.gameboy-border {
+  border: 4px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.gameboy-border-thin {
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+/* 宝可梦风格卡片 */
+.pokemon-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 4px solid #000000;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 按钮按压效果 */
+.gameboy-btn {
+  border: 4px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: all 0.1s;
+}
+
+.gameboy-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+/* 拍立得风格照片 */
+.polaroid {
+  background: #ffffff;
+  padding: 15rpx 15rpx 80rpx 15rpx;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: rotate(-2deg);
+  border: 1px solid #e0e0e0;
+}
+
+/* 像素风格字体 */
+@font-face {
+  font-family: 'PixelFont';
+  src: url('/static/fonts/pixel.woff2') format('woff2');
+}
+
+/* 手写体文字 */
+.handwriting {
+  font-family: 'Caveat', 'Comic Sans MS', cursive;
+}
+
+/* 宝可梦类型徽章 */
+.pokemon-type-badge {
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  font-weight: bold;
+  color: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.type-normal { background: #A8A878; }
+.type-fire { background: #F08030; }
+.type-water { background: #6890F0; }
+.type-electric { background: #F8D030; }
+.type-grass { background: #78C850; }
+.type-ice { background: #98D8D8; }
+.type-fighting { background: #C03028; }
+.type-poison { background: #A040A0; }
+.type-ground { background: #E0C068; }
+.type-flying { background: #A890F0; }
+.type-psychic { background: #F85888; }
+.type-bug { background: #A8B820; }
+.type-rock { background: #B8A038; }
+.type-ghost { background: #705898; }
+.type-dragon { background: #7038F8; }
+.type-dark { background: #705848; }
+.type-steel { background: #B8B8D0; }
+.type-fairy { background: #EE99AC; }
