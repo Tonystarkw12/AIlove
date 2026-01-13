@@ -97,7 +97,7 @@ CREATE TABLE recommendations (
     recommended_user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE, -- The user being recommended
     match_score INT NOT NULL, -- 0-100
     match_reason TEXT,
-    icebreakers TEXT[], -- Array of strings
+    icebreakers JSONB, -- Array of icebreaker questions stored as JSONB
     last_calculated TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (recommending_user_id, recommended_user_id) -- Ensure no duplicate recommendations
 );

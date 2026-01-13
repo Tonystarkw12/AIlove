@@ -4,6 +4,7 @@ const cors = require('cors');
 const pool = require('./db'); // Import the pool from db.js
 const http = require('http'); // Required for WebSocket server
 const path = require('path'); // Required for static file serving
+const { apiLogger, errorLogger, logger } = require('./services/logger');
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server for Express and WebSocket
@@ -13,6 +14,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json()); // For parsing application/json
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+
+// API日志中间件（记录所有API请求和响应）
+app.use('/api', apiLogger);
 
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -51,6 +55,9 @@ const wss = initializeWebSocketServer(server); // Pass the HTTP server
 // This allows REST API endpoints to trigger WebSocket events if needed.
 app.set('wss', wss);
 app.set('sendMessageToUser', sendMessageToUser);
+
+// 错误处理中间件（必须在所有路由之后）
+app.use(errorLogger);
 
 // Start Server
 server.listen(port, () => { // Use server.listen instead of app.listen for WebSocket

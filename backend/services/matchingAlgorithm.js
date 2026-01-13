@@ -1,5 +1,6 @@
 const pool = require('../db');
 const OpenAI = require('openai');
+const { getCachedMatchScore, cacheMatchScore } = require('./cacheService');
 
 // 初始化 OpenAI 客户端（如果配置了 API Key）
 let openaiClient = null;
@@ -20,6 +21,13 @@ if (process.env.OPENAI_API_KEY) {
  */
 async function calculateMatchScore(userAId, userBId) {
     try {
+        // 1. 尝试从缓存获取匹配分数
+        const cachedScore = await getCachedMatchScore(userAId, userBId);
+        if (cachedScore !== null) {
+            return cachedScore.score; // 返回缓存的分数
+        }
+
+        // 2. 缓存未命中，计算匹配分数
         // 获取两个用户的详细信息
         const usersQuery = `
             SELECT
@@ -62,8 +70,16 @@ async function calculateMatchScore(userAId, userBId) {
 
                 // 加权：LLM 分析 (60%) + 地理距离 (40%)
                 const totalScore = Math.round(llmScore * 0.6 + distanceScore * 0.4);
+                const finalScore = Math.min(100, Math.max(0, totalScore));
 
-                return Math.min(100, Math.max(0, totalScore));
+                // 3. 缓存计算结果
+                await cacheMatchScore(userAId, userBId, {
+                    score: finalScore,
+                    algorithm: 'AI (智谱AI GLM-4.7)',
+                    calculatedAt: new Date().toISOString()
+                });
+
+                return finalScore;
 
             } catch (llmError) {
                 console.error('LLM match calculation failed, falling back to traditional algorithm:', llmError);
@@ -83,8 +99,16 @@ async function calculateMatchScore(userAId, userBId) {
             interestScore * 0.4 +
             personalityScore * 0.3
         );
+        const finalScore = Math.min(100, Math.max(0, totalScore)); // 确保在 0-100 范围内
 
-        return Math.min(100, Math.max(0, totalScore)); // 确保在 0-100 范围内
+        // 3. 缓存计算结果
+        await cacheMatchScore(userAId, userBId, {
+            score: finalScore,
+            algorithm: 'Traditional (Jaccard + Cosine)',
+            calculatedAt: new Date().toISOString()
+        });
+
+        return finalScore;
 
     } catch (error) {
         console.error('Calculate match score error:', error);

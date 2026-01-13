@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const url = require('url');
-const { pool } = require('../server'); // To access DB for message saving or user validation
+const pool = require('../db'); // Import pool directly from db.js
 const { v4: uuidv4 } = require('uuid');
 
 // Map to store connected clients: { userId: WebSocket_client }

@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 7
+    },
+    "auditLog": "/mnt/f/AIlove/logs/.b2df5d0cb8592fd6cffe7fb11109e0d722a6ca52-audit.json",
+    "files": [
+        {
+            "date": 1768297721062,
+            "name": "/mnt/f/AIlove/logs/api-2026-01-13.log",
+            "hash": "56279f16620fbd1058f826efce58aaa1113345a1f20d075f0a0fff2a479fdc6c"
+        }
+    ],
+    "hashType": "sha256"
+}

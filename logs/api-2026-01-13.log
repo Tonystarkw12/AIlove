@@ -1,0 +1,4 @@
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 17:51:07","url":"/auth/login","userAgent":"curl/8.16.0"}
+{"duration":"79ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 17:51:07","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 18:09:08","url":"/auth/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"}
+{"duration":"92ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 18:09:08","url":"/login"}
