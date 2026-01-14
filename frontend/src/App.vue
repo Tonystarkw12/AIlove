@@ -1,5 +1,8 @@
 <script>
 export default {
+  globalData: {
+    backgroundMusic: null
+  },
   onLaunch: function() {
     console.log('App Launch - 检查Token');
 

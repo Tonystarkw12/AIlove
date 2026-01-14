@@ -17,5 +17,6 @@
             "password": "npg_Wl8O3fdtkFTD",
             "group": "neon"
         }
-    ]
+    ],
+    "r.lsp.promptToInstall": false
 }

@@ -7,6 +7,9 @@ import { API_BASE_URL } from './config';
 // 导入TailwindCSS样式
 import "./styles/tailwind.css";
 
+// 导入主题样式
+import "./styles/theme.css";
+
 export function createApp() {
 	const app = createSSRApp(App);
 

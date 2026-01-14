@@ -1,0 +1,237 @@
+/* ========================================
+   AIlove 主题样式 - 明暗双主题
+   ======================================== */
+
+/* CSS 变量定义 - 亮色主题（默认 GameBoy 风格） */
+:root {
+  /* 主色调 */
+  --color-primary: #9BBC0F;
+  --color-primary-dark: #8BAC0F;
+  --color-primary-light: #BBCF4F;
+
+  /* 背景色 */
+  --color-bg-primary: #9BBC0F;
+  --color-bg-secondary: #8BAC0F;
+  --color-bg-card: rgba(255, 255, 255, 0.95);
+  --color-bg-input: #ffffff;
+
+  /* 文字颜色 */
+  --color-text-primary: #000000;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+
+  /* 边框颜色 */
+  --color-border: #000000;
+  --color-border-light: #000000;
+
+  /* 阴影 */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-hard: #000000;
+
+  /* 功能色 */
+  --color-success: #9BBC0F;
+  --color-danger: #FF6B6B;
+  --color-warning: #FFD93D;
+  --color-info: #6e8efb;
+
+  /* Pokemon 类型颜色 */
+  --pokemon-normal: #A8A77A;
+  --pokemon-fire: #EE8130;
+  --pokemon-water: #6390F0;
+  --pokemon-electric: #F7D02C;
+  --pokemon-grass: #7AC74C;
+  --pokemon-ice: #96D9D6;
+  --pokemon-fighting: #C22E28;
+  --pokemon-poison: #A33EA1;
+  --pokemon-ground: #E2BF65;
+  --pokemon-flying: #A98FF3;
+  --pokemon-psychic: #F95587;
+  --pokemon-bug: #A6B91A;
+  --pokemon-rock: #B6A136;
+  --pokemon-ghost: #735797;
+  --pokemon-dragon: #6F35FC;
+  --pokemon-dark: #705746;
+  --pokemon-steel: #B7B7CE;
+  --pokemon-fairy: #D685AD;
+}
+
+/* 暗色主题（GameBoy Advance 风格） */
+[data-theme="dark"] {
+  /* 主色调 */
+  --color-primary: #1a1a2e;
+  --color-primary-dark: #16213e;
+  --color-primary-light: #0f3460;
+
+  /* 背景色 */
+  --color-bg-primary: #1a1a2e;
+  --color-bg-secondary: #16213e;
+  --color-bg-card: rgba(22, 33, 62, 0.95);
+  --color-bg-input: #0f3460;
+
+  /* 文字颜色 */
+  --color-text-primary: #eaeaea;
+  --color-text-secondary: #b0b0b0;
+  --color-text-tertiary: #808080;
+
+  /* 边框颜色 */
+  --color-border: #0f3460;
+  --color-border-light: #1a1a2e;
+
+  /* 阴影 */
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-hard: #0f3460;
+
+  /* 功能色 - 暗色模式下稍微调低饱和度 */
+  --color-success: #7AC74C;
+  --color-danger: #FF6B6B;
+  --color-warning: #FFD93D;
+  --color-info: #6e8efb;
+
+  /* Pokemon 类型颜色保持不变 */
+}
+
+/* 主题切换动画 */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 应用主题的通用类 */
+.theme-container {
+  background: linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+}
+
+.theme-card {
+  background: var(--color-bg-card);
+  border: 4px solid var(--color-border);
+  box-shadow: 8px 8px 0px 0px var(--color-shadow-hard);
+  border-radius: 20rpx;
+  backdrop-filter: blur(10px);
+}
+
+.theme-text-primary {
+  color: var(--color-text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.theme-input {
+  background: var(--color-bg-input);
+  border: 3px solid var(--color-border);
+  color: var(--color-text-primary);
+  box-shadow: 3px 3px 0px 0px var(--color-shadow-hard);
+}
+
+/* Pokemon 卡片主题样式 */
+.pokemon-card {
+  background: var(--color-bg-card);
+  border: 4px solid var(--color-border);
+  border-radius: 20rpx;
+  box-shadow: 8px 8px 0px 0px var(--color-shadow-hard);
+}
+
+.gameboy-border {
+  border: 3px solid var(--color-border);
+  box-shadow: 3px 3px 0px 0px var(--color-shadow-hard);
+}
+
+/* 主题切换按钮样式 */
+.theme-toggle-btn {
+  position: relative;
+  width: 120rpx;
+  height: 60rpx;
+  background: var(--color-bg-card);
+  border: 3px solid var(--color-border);
+  border-radius: 30rpx;
+  box-shadow: 3px 3px 0px 0px var(--color-shadow-hard);
+  display: flex;
+  align-items: center;
+  padding: 4rpx;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-btn::before {
+  content: '';
+  position: absolute;
+  width: 48rpx;
+  height: 48rpx;
+  background: var(--color-primary);
+  border-radius: 50%;
+  left: 4rpx;
+  transition: all 0.3s ease;
+  box-shadow: 2px 2px 0px 0px var(--color-shadow-hard);
+}
+
+[data-theme="dark"] .theme-toggle-btn::before {
+  left: calc(100% - 52rpx);
+  background: var(--color-info);
+}
+
+/* 主题图标 */
+.theme-icon {
+  width: 40rpx;
+  height: 40rpx;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+.theme-icon-light {
+  left: 8rpx;
+}
+
+.theme-icon-dark {
+  right: 8rpx;
+}
+
+/* 特定页面的主题样式 */
+.register-container,
+.login-container,
+.user-container,
+.index-container {
+  background: linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+  transition: background 0.3s ease;
+}
+
+/* 输入框主题 */
+.input-field {
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  border: 3px solid var(--color-border);
+  box-shadow: 3px 3px 0px 0px var(--color-shadow-hard);
+}
+
+.input-field::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* 按钮主题 */
+.gameboy-button {
+  transition: all 0.3s ease;
+}
+
+/* 菜单项主题 */
+.menu-item {
+  background: var(--color-bg-card);
+  border: 4px solid var(--color-border);
+  box-shadow: 0 4px 20px var(--color-shadow);
+}
+
+.menu-item:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px var(--color-shadow-hard);
+}
+
+/* TabBar 主题适配 */
+.tabbar-theme {
+  background: var(--color-bg-card);
+  border-top: 4px solid var(--color-border);
+}

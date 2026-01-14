@@ -1,0 +1,13 @@
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":401,"timestamp":"2026-01-13 18:39:30","url":"/me/status"}
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":403,"timestamp":"2026-01-13 18:39:40","url":"/me/status"}
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:39:48","url":"/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:40:15","url":"/me/profile"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:40:39","url":"/me/status"}
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":401,"timestamp":"2026-01-13 20:35:44","url":"/me/status"}
+{"duration":"0ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 20:37:42","url":"/api/api/users/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 20:37:54","url":"/api/api/community/photos?page=1&pageSize=10"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:01:38","url":"/api/api/users/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:28","url":"/api/api/users/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:32","url":"/api/api/community/photos?page=1&pageSize=10"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:33","url":"/api/api/users/me/status"}
+{"duration":"5ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:52:50","url":"/api/api/users/me/status"}

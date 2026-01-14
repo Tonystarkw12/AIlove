@@ -459,6 +459,8 @@ router.get('/me/status', authenticateToken, async (req, res) => {
                 daily_match_count,
                 last_match_date,
                 pokemon_avatar_id,
+                pokeball_count,
+                matched_count,
                 photos,
                 tags,
                 values_description
@@ -538,6 +540,10 @@ router.get('/me/status', authenticateToken, async (req, res) => {
             // 匹配次数
             dailyMatchCount: user.daily_match_count,
             lastMatchDate: user.last_match_date,
+
+            // 精灵球系统
+            pokeballCount: user.pokeball_count || 2,
+            matchedCount: user.matched_count || 0,
 
             // 宝可梦头像
             pokemonAvatarId: user.pokemon_avatar_id,

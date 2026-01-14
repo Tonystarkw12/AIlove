@@ -2,3 +2,58 @@
 {"duration":"79ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 17:51:07","url":"/login"}
 {"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 18:09:08","url":"/auth/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"}
 {"duration":"92ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 18:09:08","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 18:38:33","url":"/auth/login","userAgent":"curl/8.16.0"}
+{"duration":"78ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 18:38:33","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 18:39:30","url":"/users/me/status","userAgent":"curl/8.16.0"}
+{"duration":"2ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":401,"timestamp":"2026-01-13 18:39:30","url":"/me/status"}
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":401,"timestamp":"2026-01-13 18:39:30","url":"/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 18:39:40","url":"/users/me/status","userAgent":"curl/8.16.0"}
+{"duration":"2ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":403,"timestamp":"2026-01-13 18:39:40","url":"/me/status"}
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":403,"timestamp":"2026-01-13 18:39:40","url":"/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 18:39:48","url":"/auth/login","userAgent":"curl/8.16.0"}
+{"duration":"84ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 18:39:48","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 18:39:48","url":"/users/me/status","userAgent":"curl/8.16.0"}
+{"duration":"2ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:39:48","url":"/me/status"}
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:39:48","url":"/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 18:40:14","url":"/auth/login","userAgent":"curl/8.16.0"}
+{"duration":"80ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 18:40:15","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 18:40:15","url":"/users/me/profile","userAgent":"curl/8.16.0"}
+{"duration":"1ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:40:15","url":"/me/profile"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:40:15","url":"/me/profile"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 18:40:39","url":"/auth/login","userAgent":"curl/8.16.0"}
+{"duration":"77ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 18:40:39","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 18:40:39","url":"/users/me/status","userAgent":"curl/8.16.0"}
+{"duration":"1ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:40:39","url":"/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":500,"timestamp":"2026-01-13 18:40:39","url":"/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 18:42:25","url":"/auth/login","userAgent":"curl/8.16.0"}
+{"duration":"80ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 18:42:25","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 18:42:25","url":"/users/me/status","userAgent":"curl/8.16.0"}
+{"duration":"10ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":200,"timestamp":"2026-01-13 18:42:25","url":"/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 20:35:44","url":"/users/me/status","userAgent":"curl/8.16.0"}
+{"duration":"2ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":401,"timestamp":"2026-01-13 20:35:44","url":"/me/status"}
+{"duration":"2ms","level":"error","message":"API Error","method":"GET","statusCode":401,"timestamp":"2026-01-13 20:35:44","url":"/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 20:37:42","url":"/auth/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"89ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 20:37:42","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 20:37:42","url":"/api/users/me/status","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"0ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":404,"timestamp":"2026-01-13 20:37:42","url":"/api/api/users/me/status"}
+{"duration":"0ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 20:37:42","url":"/api/api/users/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 20:37:54","url":"/api/community/photos?page=1&pageSize=10","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"1ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":404,"timestamp":"2026-01-13 20:37:54","url":"/api/api/community/photos?page=1&pageSize=10"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 20:37:54","url":"/api/api/community/photos?page=1&pageSize=10"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 21:01:38","url":"/api/users/me/status","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"1ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:01:38","url":"/api/api/users/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:01:38","url":"/api/api/users/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"POST","timestamp":"2026-01-13 21:05:28","url":"/auth/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"74ms","ip":"::1","level":"http","message":"API Response","method":"POST","statusCode":200,"timestamp":"2026-01-13 21:05:28","url":"/login"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 21:05:28","url":"/api/users/me/status","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"1ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:28","url":"/api/api/users/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:28","url":"/api/api/users/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 21:05:32","url":"/api/community/photos?page=1&pageSize=10","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"1ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:32","url":"/api/api/community/photos?page=1&pageSize=10"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:32","url":"/api/api/community/photos?page=1&pageSize=10"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 21:05:33","url":"/api/users/me/status","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"1ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:33","url":"/api/api/users/me/status"}
+{"duration":"1ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:05:33","url":"/api/api/users/me/status"}
+{"ip":"::1","level":"http","message":"API Request","method":"GET","timestamp":"2026-01-13 21:52:50","url":"/api/users/me/status","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}
+{"duration":"5ms","ip":"::1","level":"http","message":"API Response","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:52:50","url":"/api/api/users/me/status"}
+{"duration":"5ms","level":"error","message":"API Error","method":"GET","statusCode":404,"timestamp":"2026-01-13 21:52:50","url":"/api/api/users/me/status"}

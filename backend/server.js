@@ -38,8 +38,12 @@ const tasksRoutes = require('./routes/tasks'); // Phase 2: 约会任务路由
 const spotsRoutes = require('./routes/spots'); // Phase 2: 约会地点路由
 const rewardsRoutes = require('./routes/rewards'); // Phase 4: 积分奖励路由
 const communityRoutes = require('./routes/community'); // Phase 3: 社区照片墙路由
+const pokeballRoutes = require('./routes/pokeball'); // 精灵球系统路由
+const matchesRoutes = require('./routes/matches'); // 用户匹配记录路由
+const wechatAuthRoutes = require('./routes/wechatAuth'); // 微信认证路由
 
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', wechatAuthRoutes); // 微信登录API
 app.use('/api/users', userRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/chat', chatRoutes);
@@ -48,6 +52,8 @@ app.use('/api/tasks', tasksRoutes); // Phase 2: 约会任务 API
 app.use('/api/spots', spotsRoutes); // Phase 2: 约会地点 API
 app.use('/api/rewards', rewardsRoutes); // Phase 4: 积分奖励 API
 app.use('/api/community', communityRoutes); // Phase 3: 社区照片墙 API
+app.use('/api/pokeball', pokeballRoutes); // 精灵球系统 API
+app.use('/api/users', matchesRoutes); // 用户匹配记录 API
 
 // WebSocket Server Setup
 const { initializeWebSocketServer, sendMessageToUser } = require('./services/websocketService');
