@@ -6,7 +6,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000" # Exposes backend's port 3000 to host's port 3000
+      - "3050:3000" # Exposes backend's port 3000 to host's port 3000
     volumes:
       - ./backend:/usr/src/app/backend # Mounts backend code for development (optional for production)
       - /usr/src/app/backend/node_modules # Excludes node_modules from being overwritten by host mount
@@ -21,7 +21,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "8080:80" # Exposes Nginx (port 80 in container) to host's port 8080
+      - "8085:80" # Exposes Nginx (port 80 in container) to host's port 8080
     depends_on:
       - backend
     volumes:

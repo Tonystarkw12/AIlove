@@ -1,11 +1,14 @@
 require('dotenv').config(); // Ensure environment variables are loaded
 const { Pool } = require('pg');
 
+// SSL configuration - disable for local development
+const sslConfig = process.env.DB_SSL === 'true' ? {
+  rejectUnauthorized: false
+} : false;
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Required for NeonDB, adjust if your DB has different SSL requirements
-  }
+  ssl: sslConfig
 });
 
 // Optional: Test connection on startup

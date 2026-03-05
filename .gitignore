@@ -265,3 +265,4 @@ test-*.js
 *.pid
 *.seed
 *.pid.lock
+.gitnexus
