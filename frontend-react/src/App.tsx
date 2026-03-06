@@ -7,6 +7,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { MapPage } from './pages/MapPage';
 import { ChatPage } from './pages/ChatPage';
 import { CommunityPage } from './pages/CommunityPage';
+import { PokeballPage } from './pages/PokeballPage';
 import { TabBar } from './components/TabBar';
 import './index.css';
 
@@ -88,6 +89,16 @@ function AppRoutes() {
           <ProtectedRoute>
             <AppLayout>
               <ProfilePage />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pokeball"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <PokeballPage />
             </AppLayout>
           </ProtectedRoute>
         }

@@ -5,10 +5,14 @@ const pool = require('./db'); // Import the pool from db.js
 const http = require('http'); // Required for WebSocket server
 const path = require('path'); // Required for static file serving
 const { apiLogger, errorLogger, logger } = require('./services/logger');
+const { initializeRedisClient } = require('./services/redisClient');
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server for Express and WebSocket
 const port = process.env.PORT || 3000;
+
+// Initialize Redis
+initializeRedisClient().catch(err => console.error('Redis初始化失败:', err));
 
 // Middleware
 app.use(cors());

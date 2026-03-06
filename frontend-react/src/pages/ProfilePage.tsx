@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { HpExpBar } from '../components/HpExpBar';
@@ -17,11 +18,12 @@ interface UserProfile {
   avatar_url?: string;
   points: number;
   level: number;
-  vip_level?: string;
+  pokeball_count?: number;
 }
 
 export function ProfilePage() {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -46,8 +48,10 @@ export function ProfilePage() {
     try {
       await api.put('/users/me/profile', profile);
       setIsEditing(false);
+      alert('保存成功！');
     } catch (error) {
       console.error('Failed to save profile:', error);
+      alert('保存失败，请重试');
     }
   };
 
@@ -61,6 +65,7 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
+      {/* Header & Avatar */}
       <div className="pokemon-card p-6 mb-4">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">个人资料</h1>
@@ -72,14 +77,12 @@ export function ProfilePage() {
           </button>
         </div>
 
-        {/* Avatar */}
         <div className="flex justify-center mb-4">
           <div className="w-24 h-24 rounded-full bg-[#306230] flex items-center justify-center text-white text-3xl font-bold border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             {profile?.nickname?.charAt(0) || '?'}
           </div>
         </div>
 
-        {/* HP/EXP Bar */}
         {profile && (
           <HpExpBar
             hp={profile.points || 0}
@@ -89,16 +92,34 @@ export function ProfilePage() {
           />
         )}
 
-        {/* Level Info */}
-        <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+        <div className="mt-4 grid grid-cols-3 gap-2 text-sm text-center">
           <div className="bg-white/50 p-2 rounded">
-            <span className="text-gray-600">等级:</span>
-            <span className="font-bold ml-2">Lv.{profile?.level || 1}</span>
+            <p className="text-gray-600">等级</p>
+            <p className="font-bold">Lv.{profile?.level || 1}</p>
           </div>
           <div className="bg-white/50 p-2 rounded">
-            <span className="text-gray-600">积分:</span>
-            <span className="font-bold ml-2">{profile?.points || 0}</span>
+            <p className="text-gray-600">积分</p>
+            <p className="font-bold">{profile?.points || 0}</p>
           </div>
+          <div className="bg-[#FFCB05] p-2 rounded border-2 border-black">
+            <p className="text-gray-700">🔮</p>
+            <p className="font-bold">{profile?.pokeball_count || 0}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Pokeball Purchase */}
+      <div className="pokemon-card p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-bold">🔮 精灵球</h2>
+            <p className="text-sm text-gray-600">用于发起匹配</p>
+          </div>
+          <GameboyButton
+            text="购买"
+            onClick={() => navigate('/pokeball')}
+            size="small"
+          />
         </div>
       </div>
 
@@ -148,7 +169,7 @@ export function ProfilePage() {
               <input
                 type="number"
                 value={profile?.height_cm || ''}
-                onChange={(e) => setProfile({ ...profile!, height_cm: parseInt(e.target.value) })}
+                onChange={(e) => setProfile({ ...profile!, height_cm: parseInt(e.target.value) || undefined })}
                 disabled={!isEditing}
                 className="w-full p-3 border-4 border-black rounded-lg bg-white disabled:bg-gray-100"
               />
@@ -158,7 +179,7 @@ export function ProfilePage() {
               <input
                 type="number"
                 value={profile?.weight_kg || ''}
-                onChange={(e) => setProfile({ ...profile!, weight_kg: parseInt(e.target.value) })}
+                onChange={(e) => setProfile({ ...profile!, weight_kg: parseInt(e.target.value) || undefined })}
                 disabled={!isEditing}
                 className="w-full p-3 border-4 border-black rounded-lg bg-white disabled:bg-gray-100"
               />
@@ -188,21 +209,13 @@ export function ProfilePage() {
           </div>
 
           {isEditing && (
-            <GameboyButton
-              text="保存资料"
-              onClick={handleSave}
-              size="large"
-            />
+            <GameboyButton text="保存资料" onClick={handleSave} size="large" />
           )}
         </div>
       </div>
 
       <div className="mt-4">
-        <GameboyButton
-          text="退出登录"
-          variant="danger"
-          onClick={logout}
-        />
+        <GameboyButton text="退出登录" variant="danger" onClick={logout} />
       </div>
     </div>
   );

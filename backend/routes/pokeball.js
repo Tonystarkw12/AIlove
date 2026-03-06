@@ -109,7 +109,7 @@ router.post('/recharge', authenticateToken, async (req, res) => {
 
     // 获取当前用户精灵球数量
     const userResult = await client.query(
-      'SELECT pokeball_count FROM users WHERE id = $1 FOR UPDATE',
+      'SELECT pokeball_count FROM users WHERE user_id = $1 FOR UPDATE',
       [userId]
     );
 
@@ -128,7 +128,7 @@ router.post('/recharge', authenticateToken, async (req, res) => {
 
     // 更新用户精灵球数量
     await client.query(
-      'UPDATE users SET pokeball_count = $1 WHERE id = $2',
+      'UPDATE users SET pokeball_count = $1 WHERE user_id = $2',
       [newBalance, userId]
     );
 
@@ -203,7 +203,7 @@ router.post('/consume', authenticateToken, async (req, res) => {
 
     // 获取当前用户精灵球数量
     const userResult = await client.query(
-      'SELECT pokeball_count FROM users WHERE id = $1 FOR UPDATE',
+      'SELECT pokeball_count FROM users WHERE user_id = $1 FOR UPDATE',
       [userId]
     );
 
@@ -234,7 +234,7 @@ router.post('/consume', authenticateToken, async (req, res) => {
 
     // 更新用户精灵球数量
     await client.query(
-      'UPDATE users SET pokeball_count = $1 WHERE id = $2',
+      'UPDATE users SET pokeball_count = $1 WHERE user_id = $2',
       [newBalance, userId]
     );
 
@@ -282,7 +282,7 @@ router.get('/balance', authenticateToken, async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT pokeball_count FROM users WHERE id = $1',
+      'SELECT pokeball_count FROM users WHERE user_id = $1',
       [userId]
     );
 
