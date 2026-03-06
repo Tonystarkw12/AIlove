@@ -20,6 +20,10 @@
             placeholder="请输入昵称"
             v-model="formData.nickname"
             maxlength="20"
+            @click.stop
+            @touchstart.stop
+            confirm-type="done"
+            :adjust-position="true"
           />
         </view>
 
@@ -30,6 +34,10 @@
             type="text"
             placeholder="请输入邮箱"
             v-model="formData.email"
+            @click.stop
+            @touchstart.stop
+            confirm-type="done"
+            :adjust-position="true"
           />
         </view>
 
@@ -41,6 +49,10 @@
             placeholder="6-20位密码"
             v-model="formData.password"
             maxlength="20"
+            @click.stop
+            @touchstart.stop
+            confirm-type="done"
+            :adjust-position="true"
           />
         </view>
 
@@ -438,9 +450,15 @@ function playBackgroundMusic() {
   border-radius: 12rpx;
   box-sizing: border-box;
   font-family: 'Varela Round', 'Nunito', sans-serif;
-  position: relative;
-  z-index: 100;
-  pointer-events: auto;
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #3B4CCA;
+  box-shadow: 3px 3px 0px 0px #3B4CCA;
 }
 
 .input-field::placeholder {
@@ -455,8 +473,7 @@ function playBackgroundMusic() {
 
 /* 确保输入框可点击 */
 .form-item {
-  position: relative;
-  z-index: 50;
+  margin-bottom: 30rpx;
 }
 
 /* 分割线 */

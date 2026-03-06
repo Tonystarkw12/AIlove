@@ -101,9 +101,12 @@ AIlove 是一个创新的约会平台，采用 **宝可梦 GameBoy 复古风格*
 | Node.js | 18+ | 运行时环境 |
 | Express.js | 4.x | Web 框架 |
 | PostgreSQL | 14+ | 关系型数据库 |
+| PostGIS | 3.3+ | 地理空间扩展 |
+| Redis | 6.0+ | 缓存服务 (可选) |
 | JWT | - | 身份认证 |
 | Multer | - | 文件上传 |
 | WebSocket | - | 实时通信 |
+| 智谱AI | GLM-4.7 | AI智能匹配 |
 
 ### 数据库设计
 
@@ -122,7 +125,8 @@ AIlove 是一个创新的约会平台，采用 **宝可梦 GameBoy 复古风格*
 ### 环境要求
 
 - Node.js >= 18.0.0
-- PostgreSQL >= 14
+- PostgreSQL >= 14 (with PostGIS extension)
+- Redis >= 6.0 (可选，用于缓存)
 - npm 或 yarn 或 pnpm
 
 ### 1. 克隆项目
@@ -151,36 +155,63 @@ npm install
 在 `backend/.env` 文件中配置：
 
 ```env
+# ===========================================
+# AI月老 Backend Configuration
+# ===========================================
+
 # 服务器配置
-PORT=3000
+PORT=3052
 NODE_ENV=development
 
-# 数据库配置
-DATABASE_URL="postgresql://username:password@localhost:5432/database"
+# 数据库配置 (PostGIS-enabled PostgreSQL)
+DATABASE_URL="postgresql://aiyueuser:aiyuepass123@localhost:5434/aiyuelaodb"
+DB_SSL=false
 
 # JWT 配置
 JWT_SECRET="your-very-strong-jwt-secret-key"
 
-# AI API 配置（可选）
-GEMINI_API_BASE_URL="your-api-url"
-GEMINI_API_KEY="your-api-key"
+# Redis 配置 (可选，用于缓存)
+REDIS_URL="redis://localhost:6379"
 
-# OpenAI API 配置（可选）
-OPENAI_API_KEY="your-openai-key"
-OPENAI_BASE_URL="https://open.bigmodel.cn/api/paas/v4"
+# 智谱AI API 配置 (用于智能匹配)
+OPENAI_API_KEY=your_api_key_here
+OPENAI_BASE_URL=https://open.bigmodel.cn/api/coding/paas/v4
 OPENAI_MODEL=glm-4.7
 ```
 
 ### 4. 数据库初始化
 
+#### 方式一：使用 Docker 启动 PostGIS (推荐)
+
 ```bash
-# 执行数据库迁移
+# 启动 PostgreSQL + PostGIS 容器
+docker run -d --name ailove-postgres \
+  -e POSTGRES_USER=aiyueuser \
+  -e POSTGRES_PASSWORD=aiyuepass123 \
+  -e POSTGRES_DB=aiyuelaodb \
+  -p 5434:5432 \
+  postgis/postgis:15-3.3-alpine
+
+# 等待数据库启动
+sleep 5
+
+# 初始化数据库表
+cd backend
+docker exec -i ailove-postgres psql -U aiyueuser -d aiyuelaodb < schema.sql
+```
+
+#### 方式二：使用现有 PostgreSQL
+
+```bash
 cd backend
 
-# Phase 1: 用户表扩展
-psql -U username -d database -f migrations/add_user_profile_fields_v2.sql
+# 确保 PostGIS 扩展已启用
+psql -U username -d database -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 
-# Phase 3: 社区功能表
+# 执行数据库初始化
+psql -U username -d database -f schema.sql
+
+# Phase 3: 社区功能表 (如果使用迁移文件)
 psql -U username -d database -f migrations/create_community_tables.sql
 ```
 
@@ -211,8 +242,8 @@ npm run build:h5
 ### 6. 访问应用
 
 - **前端应用**: http://localhost:5173 (H5)
-- **后端 API**: http://localhost:3000
-- **API 健康检查**: http://localhost:3000/
+- **后端 API**: http://localhost:3052
+- **API 健康检查**: http://localhost:3052/
 
 ---
 
@@ -493,7 +524,7 @@ WS     /ws/chat                    # WebSocket 连接
 
 ```bash
 # 后端健康检查
-curl http://localhost:3000/
+curl http://localhost:3052/
 
 # 前端访问
 # 浏览器打开 http://localhost:5173
