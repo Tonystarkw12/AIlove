@@ -16,8 +16,8 @@ interface NearbyUser {
   location_longitude?: number;
 }
 
-// 高德地图API Key - 请替换为你自己的key
-const AMAP_KEY = 'YOUR_AMAP_KEY';
+// 高德地图 API Key - 从环境变量读取
+const AMAP_KEY = import.meta.env.VITE_AMAP_KEY || 'cb927bb49904fd30765c001e4c03e0f5';
 
 export function MapPage() {
   const [nearbyUsers, setNearbyUsers] = useState<NearbyUser[]>([]);
@@ -25,7 +25,9 @@ export function MapPage() {
   const [radius, setRadius] = useState(10);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedUser, setSelectedUser] = useState<NearbyUser | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const mapRef = useRef<any>(null);
+  const amapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,6 +54,9 @@ export function MapPage() {
       });
 
       if (!containerRef.current) return;
+
+      // 存储 AMap 引用供后续使用
+      amapRef.current = AMap;
 
       const map = new AMap.Map(containerRef.current, {
         viewMode: '2D',
@@ -80,12 +85,14 @@ export function MapPage() {
             content: '<div style="background:#3B4CCA;color:white;padding:5px 10px;border-radius:50%;">我</div>',
           }).setMap(map);
         } else {
-          console.error('定位失败:', result);
+          const errorMsg = result?.message || '定位失败，请检查浏览器权限设置';
+          setLocationError(`定位失败：${errorMsg}`);
           setLoading(false);
         }
       });
     } catch (error) {
-      console.error('地图初始化失败:', error);
+      const errorMsg = error instanceof Error ? error.message : '地图初始化失败';
+      setLocationError(errorMsg);
       setLoading(false);
     }
   };
@@ -111,10 +118,8 @@ export function MapPage() {
   };
 
   const addMarkers = (users: NearbyUser[]) => {
-    if (!mapRef.current) return;
-    // @ts-ignore
-    const AMap = window.AMap;
-    if (!AMap) return;
+    if (!mapRef.current || !amapRef.current) return;
+    const AMap = amapRef.current;
 
     users.forEach((user) => {
       if (user.location_latitude && user.location_longitude) {
@@ -153,6 +158,19 @@ export function MapPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
+      {/* Location Error Display */}
+      {locationError && (
+        <div className="pokemon-card bg-red-100 border-4 border-red-500 p-4 mb-4">
+          <div className="flex items-center gap-2 text-red-700">
+            <span className="text-xl">⚠️</span>
+            <span className="font-bold">{locationError}</span>
+          </div>
+          <p className="text-sm mt-2 text-red-600">
+            请检查浏览器定位权限设置，或稍后重试
+          </p>
+        </div>
+      )}
+
       {/* Map Container */}
       <div className="pokemon-card p-2 mb-4">
         <div

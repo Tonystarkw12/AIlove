@@ -15,7 +15,6 @@ interface Photo {
 }
 
 export function CommunityPage() {
-  const {  } = useAuth();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
