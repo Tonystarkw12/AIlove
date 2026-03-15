@@ -1,7 +1,7 @@
 // API Configuration
-export const API_BASE_URL = 'http://localhost:3052/api';
-export const UPLOAD_BASE_URL = 'http://localhost:3052/uploads';
-export const WS_URL = 'ws://localhost:3052/ws/chat';
+export const API_BASE_URL = 'http://192.168.0.14:3052/api';
+export const UPLOAD_BASE_URL = 'http://192.168.0.14:3052/uploads';
+export const WS_URL = 'ws://192.168.0.14:3052/ws/chat';
 
 // API Endpoints
 export const API_ENDPOINTS = {
