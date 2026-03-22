@@ -9,6 +9,7 @@ import { ChatPage } from './pages/ChatPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { PokeballPage } from './pages/PokeballPage';
 import { TabBar } from './components/TabBar';
+import { MusicPlayer } from './components/MusicPlayer';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -32,6 +33,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
+      <MusicPlayer autoPlay={false} />
       {children}
       <TabBar />
     </div>

@@ -2,6 +2,8 @@
 export const API_BASE_URL = 'http://192.168.0.14:3052/api';
 export const UPLOAD_BASE_URL = 'http://192.168.0.14:3052/uploads';
 export const WS_URL = 'ws://192.168.0.14:3052/ws/chat';
+export const MUSIC_BASE_URL = 'http://192.168.0.14:3052/music';
+export const PICTURES_BASE_URL = 'http://192.168.0.14:3052/pictures';
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -30,5 +32,22 @@ export const API_ENDPOINTS = {
     UPLOAD: '/community/upload-photo',
     LIKE: (photoId: string) => `/community/photos/${photoId}/like`,
   },
+  POKEBALL: {
+    BALANCE: '/pokeball/balance',
+    HISTORY: '/pokeball/history',
+    RECHARGE: '/pokeball/recharge',
+    CONSUME: '/pokeball/consume',
+    CONFIRM_PAYMENT: '/pokeball/confirm-payment',
+  },
   RECOMMENDATIONS: '/recommendations',
+} as const;
+
+// QR Code images mapping to amounts
+export const QR_CODE_IMAGES = {
+  1: '0c5a516cebe2de0af541055c17258904.jpg',
+  5: '291a087c7b9f2211de1b8078ab4eb6f6.jpg',
+  10: '5443633d2ed15065ce4ec7425f78c861.jpg',
+  20: '6542f00d80affe884a9874bbe39dc2b2.jpg',
+  50: '8d0cc8904ccb7da00f86d87282166b01.jpg',
+  100: 'd8ed6d84c8a8d3370c46a0fb95feed57.jpg',
 } as const;

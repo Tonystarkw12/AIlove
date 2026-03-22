@@ -25,6 +25,10 @@ app.use('/api', apiLogger);
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve static files for music and pictures
+app.use('/music', express.static(path.join(__dirname, '../music')));
+app.use('/pictures', express.static(path.join(__dirname, '../pictures')));
+
 // Database Connection is now handled in db.js
 
 // Basic Route

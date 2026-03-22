@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { GameboyButton } from '../components/GameboyButton';
+import { PICTURES_BASE_URL, QR_CODE_IMAGES } from '../config';
 
 interface TransactionRecord {
   id: number;
@@ -80,6 +81,8 @@ export function PokeballPage() {
     });
   };
 
+  const qrCodeImage = QR_CODE_IMAGES[selectedAmount as keyof typeof QR_CODE_IMAGES];
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
@@ -135,11 +138,15 @@ export function PokeballPage() {
         </div>
       </div>
 
-      {/* QR Code Placeholder */}
+      {/* QR Code Display */}
       <div className="pokemon-card p-4 mb-4 text-center">
         <h2 className="text-lg font-bold mb-3">📱 微信扫码支付</h2>
-        <div className="w-48 h-48 mx-auto bg-white border-4 border-black rounded-lg flex items-center justify-center">
-          <span className="text-6xl">💳</span>
+        <div className="w-56 h-56 mx-auto bg-white border-4 border-black rounded-lg overflow-hidden">
+          <img
+            src={`${PICTURES_BASE_URL}/${qrCodeImage}`}
+            alt={`充值${selectedAmount}元二维码`}
+            className="w-full h-full object-cover"
+          />
         </div>
         <p className="text-sm text-gray-600 mt-3">
           请扫描二维码支付，然后点击"我已支付"按钮
@@ -176,7 +183,7 @@ export function PokeballPage() {
                   <p className={`font-bold ${tx.type === 'recharge' ? 'text-green-600' : 'text-red-600'}`}>
                     {tx.type === 'recharge' ? '+' : '-'}{tx.amount}
                   </p>
-                  <p className="text-xs text-gray-500">余额: {tx.balance_after}</p>
+                  <p className="text-xs text-gray-500">余额：{tx.balance_after}</p>
                 </div>
               </div>
             ))}
