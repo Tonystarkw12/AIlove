@@ -47,53 +47,83 @@ export function MapPage() {
 
   const initMap = async () => {
     try {
+      console.log('开始初始化地图...');
+      console.log('容器元素:', containerRef.current);
+      console.log('AMAP_KEY:', AMAP_KEY);
+      
       const AMap = await AMapLoader.load({
         key: AMAP_KEY,
         version: '2.0',
         plugins: ['AMap.Geolocation', 'AMap.Marker'],
       });
 
-      if (!containerRef.current) return;
+      console.log('AMap 加载成功:', AMap);
+
+      if (!containerRef.current) {
+        console.error('地图容器不存在');
+        return;
+      }
 
       // 存储 AMap 引用供后续使用
       amapRef.current = AMap;
 
       const map = new AMap.Map(containerRef.current, {
         viewMode: '2D',
-        zoom: 14,
+        zoom: 15,
         center: [116.397428, 39.90923],
+        mapStyle: 'amap://styles/normal',
       });
 
+      console.log('地图实例创建成功:', map);
       mapRef.current = map;
 
-      // 获取定位
-      const geolocation = new AMap.Geolocation({
-        enableHighAccuracy: true,
-        timeout: 10000,
-      });
+      // 等待地图加载完成后获取定位
+      map.on('complete', () => {
+        console.log('地图加载完成事件触发');
+        
+        // 获取定位
+        const geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true,
+          timeout: 10000,
+        });
 
-      geolocation.getCurrentPosition((status: string, result: any) => {
-        if (status === 'complete') {
-          const { lat, lng } = result.position;
-          setUserLocation({ lat, lng });
-          map.setCenter([lng, lat]);
+        geolocation.getCurrentPosition((status: string, result: any) => {
+          console.log('定位结果:', status, result);
+          if (status === 'complete') {
+            const { lat, lng } = result.position;
+            setUserLocation({ lat, lng });
+            
+            // 先设置中心点，再调整缩放级别以确保地图瓦片正确加载
+            map.setCenter([lng, lat]);
+            map.setZoom(15);
+            
+            // 强制刷新地图视图以确保瓦片加载
+            map.setMapStyle('amap://styles/normal');
+            
+            // 调用 resize 确保地图正确渲染
+            map.resize();
 
-          // 添加自己的位置标记
-          new AMap.Marker({
-            position: [lng, lat],
-            title: '我的位置',
-            content: '<div style="background:#3B4CCA;color:white;padding:5px 10px;border-radius:50%;">我</div>',
-          }).setMap(map);
-        } else {
-          const errorMsg = result?.message || '定位失败，请检查浏览器权限设置';
-          setLocationError(`定位失败：${errorMsg}`);
-          setLoading(false);
-        }
+            // 添加自己的位置标记
+            new AMap.Marker({
+              position: [lng, lat],
+              title: '我的位置',
+              content: '<div style="background:#3B4CCA;color:white;padding:5px 10px;border-radius:50%;">我</div>',
+            }).setMap(map);
+            
+            console.log('定位成功，地图中心:', [lng, lat]);
+          } else {
+            const errorMsg = result?.message || '定位失败，请检查浏览器权限设置';
+            setLocationError(`定位失败：${errorMsg}`);
+            setLoading(false);
+            console.error('定位失败:', errorMsg);
+          }
+        });
       });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : '地图初始化失败';
       setLocationError(errorMsg);
       setLoading(false);
+      console.error('地图初始化错误:', error);
     }
   };
 
@@ -175,7 +205,9 @@ export function MapPage() {
       <div className="pokemon-card p-2 mb-4">
         <div
           ref={containerRef}
-          className="w-full h-64 md:h-80 rounded-lg border-4 border-black"
+          id="map-container"
+          style={{ width: '100%', height: '400px' }}
+          className="w-full rounded-lg border-4 border-black bg-white"
         />
       </div>
 

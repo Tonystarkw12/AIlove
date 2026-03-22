@@ -266,3 +266,4 @@ test-*.js
 *.seed
 *.pid.lock
 .gitnexus
+.gstack/
