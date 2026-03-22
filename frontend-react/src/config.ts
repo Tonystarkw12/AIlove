@@ -42,12 +42,12 @@ export const API_ENDPOINTS = {
   RECOMMENDATIONS: '/recommendations',
 } as const;
 
-// QR Code images mapping to amounts
+// QR Code images mapping to amounts (filename hash -> amount shown in image)
 export const QR_CODE_IMAGES = {
-  1: '0c5a516cebe2de0af541055c17258904.jpg',
-  5: '291a087c7b9f2211de1b8078ab4eb6f6.jpg',
-  10: '5443633d2ed15065ce4ec7425f78c861.jpg',
-  20: '6542f00d80affe884a9874bbe39dc2b2.jpg',
-  50: '8d0cc8904ccb7da00f86d87282166b01.jpg',
-  100: 'd8ed6d84c8a8d3370c46a0fb95feed57.jpg',
+  1: '5443633d2ed15065ce4ec7425f78c861.jpg',      // ¥1.00
+  5: 'd8ed6d84c8a8d3370c46a0fb95feed57.jpg',      // ¥5.00
+  10: '6542f00d80affe884a9874bbe39dc2b2.jpg',     // ¥10.00
+  20: '291a087c7b9f2211de1b8078ab4eb6f6.jpg',     // ¥20.00
+  50: '8d0cc8904ccb7da00f86d87282166b01.jpg',     // ¥50.00
+  100: '0c5a516cebe2de0af541055c17258904.jpg',    // ¥100.00
 } as const;

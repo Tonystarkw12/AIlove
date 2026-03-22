@@ -1,18 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
+import { MUSIC_BASE_URL } from '../config';
 
 interface MusicPlayerProps {
   src?: string;
   autoPlay?: boolean;
 }
 
-export function MusicPlayer({ src = '/music/松本梨香 - めざせポケモンマスター.mp3', autoPlay = false }: MusicPlayerProps) {
+export function MusicPlayer({ src, autoPlay = false }: MusicPlayerProps) {
+  const musicSrc = src || `${MUSIC_BASE_URL}/松本梨香 - めざせポケモンマスター.mp3`;
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     // Create audio element
-    audioRef.current = new Audio(src);
+    audioRef.current = new Audio(musicSrc);
     audioRef.current.loop = true;
 
     // Set up event listeners
@@ -20,6 +23,7 @@ export function MusicPlayer({ src = '/music/松本梨香 - めざせポケモン
 
     const handleCanPlay = () => {
       setIsLoading(false);
+      setHasError(false);
       if (autoPlay) {
         audio.play().catch(() => {
           // Auto-play was blocked, show controls instead
@@ -32,10 +36,11 @@ export function MusicPlayer({ src = '/music/松本梨香 - めざせポケモン
       setIsPlaying(false);
     };
 
-    const handleError = () => {
+    const handleError = (e: Event) => {
+      console.error('Music playback error:', e);
       setIsLoading(false);
       setIsPlaying(false);
-      console.error('Music playback failed');
+      setHasError(true);
     };
 
     audio.addEventListener('canplaythrough', handleCanPlay);
@@ -50,10 +55,10 @@ export function MusicPlayer({ src = '/music/松本梨香 - めざせポケモン
         audio.pause();
       }
     };
-  }, [src, autoPlay]);
+  }, [musicSrc, autoPlay]);
 
   const togglePlay = async () => {
-    if (!audioRef.current || isLoading) return;
+    if (!audioRef.current || isLoading || hasError) return;
 
     try {
       if (isPlaying) {
@@ -66,8 +71,22 @@ export function MusicPlayer({ src = '/music/松本梨香 - めざせポケモン
     } catch (error) {
       console.error('Playback failed:', error);
       setIsPlaying(false);
+      setHasError(true);
     }
   };
+
+  if (hasError) {
+    return (
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          className="w-12 h-12 rounded-full border-4 border-black bg-gray-400 cursor-not-allowed flex items-center justify-center"
+          title="音乐加载失败"
+        >
+          <span className="text-xl">❌</span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed top-4 right-4 z-50">
