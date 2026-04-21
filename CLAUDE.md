@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus MCP
 
-This project is indexed by GitNexus as **AIlove** (288 symbols, 435 relationships, 6 execution flows).
+This project is indexed by GitNexus as **AIlove** (250 symbols, 398 relationships, 6 execution flows).
 
 GitNexus provides a knowledge graph over this codebase — call chains, blast radius, execution flows, and semantic search.
 

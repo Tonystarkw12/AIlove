@@ -1,0 +1,333 @@
+{
+  "id": "2026-04-21-173810",
+  "generated_at": "2026-04-21T09:38:10.497187525Z",
+  "language": "zh",
+  "pages": [
+    {
+      "slug": "1-xiang-mu-gai-shu",
+      "title": "项目概述",
+      "file": "1-xiang-mu-gai-shu.md",
+      "section": "入门指南",
+      "level": "Beginner"
+    },
+    {
+      "slug": "2-kuai-su-kai-shi",
+      "title": "快速开始",
+      "file": "2-kuai-su-kai-shi.md",
+      "section": "入门指南",
+      "level": "Beginner"
+    },
+    {
+      "slug": "3-ji-zhu-zhan-yu-yi-lai",
+      "title": "技术栈与依赖",
+      "file": "3-ji-zhu-zhan-yu-yi-lai.md",
+      "section": "入门指南",
+      "level": "Beginner"
+    },
+    {
+      "slug": "4-he-xin-gong-neng-dao-lan",
+      "title": "核心功能导览",
+      "file": "4-he-xin-gong-neng-dao-lan.md",
+      "section": "入门指南",
+      "level": "Beginner"
+    },
+    {
+      "slug": "5-huan-jing-bian-liang-shuo-ming",
+      "title": "环境变量说明",
+      "file": "5-huan-jing-bian-liang-shuo-ming.md",
+      "section": "入门指南",
+      "group": "环境配置",
+      "level": "Beginner"
+    },
+    {
+      "slug": "6-shu-ju-ku-chu-shi-hua-yu-qian-yi",
+      "title": "数据库初始化与迁移",
+      "file": "6-shu-ju-ku-chu-shi-hua-yu-qian-yi.md",
+      "section": "入门指南",
+      "group": "环境配置",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "7-xi-tong-zheng-ti-jia-gou",
+      "title": "系统整体架构",
+      "file": "7-xi-tong-zheng-ti-jia-gou.md",
+      "section": "架构设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "8-qian-hou-duan-tong-xin-xie-yi",
+      "title": "前后端通信协议",
+      "file": "8-qian-hou-duan-tong-xin-xie-yi.md",
+      "section": "架构设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "9-websocket-shi-shi-tong-xin",
+      "title": "WebSocket 实时通信",
+      "file": "9-websocket-shi-shi-tong-xin.md",
+      "section": "架构设计",
+      "group": "核心服务",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "10-redis-huan-cun-ce-lue",
+      "title": "Redis 缓存策略",
+      "file": "10-redis-huan-cun-ce-lue.md",
+      "section": "架构设计",
+      "group": "核心服务",
+      "level": "Advanced"
+    },
+    {
+      "slug": "11-ri-zhi-yu-cuo-wu-chu-li",
+      "title": "日志与错误处理",
+      "file": "11-ri-zhi-yu-cuo-wu-chu-li.md",
+      "section": "架构设计",
+      "group": "核心服务",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "12-react-xiang-mu-jie-gou",
+      "title": "React 项目结构",
+      "file": "12-react-xiang-mu-jie-gou.md",
+      "section": "前端开发",
+      "level": "Beginner"
+    },
+    {
+      "slug": "13-lu-you-yu-quan-xian-kong-zhi",
+      "title": "路由与权限控制",
+      "file": "13-lu-you-yu-quan-xian-kong-zhi.md",
+      "section": "前端开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "14-zhuang-tai-guan-li-yu-ren-zheng-shang-xia-wen",
+      "title": "状态管理与认证上下文",
+      "file": "14-zhuang-tai-guan-li-yu-ren-zheng-shang-xia-wen.md",
+      "section": "前端开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "15-gameboy-fu-gu-feng-ge-she-ji",
+      "title": "GameBoy 复古风格设计",
+      "file": "15-gameboy-fu-gu-feng-ge-she-ji.md",
+      "section": "前端开发",
+      "group": "UI 组件库",
+      "level": "Beginner"
+    },
+    {
+      "slug": "16-bao-ke-meng-zhu-ti-zu-jian",
+      "title": "宝可梦主题组件",
+      "file": "16-bao-ke-meng-zhu-ti-zu-jian.md",
+      "section": "前端开发",
+      "group": "UI 组件库",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "17-tailwindcss-yang-shi-ding-zhi",
+      "title": "TailwindCSS 样式定制",
+      "file": "17-tailwindcss-yang-shi-ding-zhi.md",
+      "section": "前端开发",
+      "group": "UI 组件库",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "18-shou-ye-yu-tui-jian-lie-biao",
+      "title": "首页与推荐列表",
+      "file": "18-shou-ye-yu-tui-jian-lie-biao.md",
+      "section": "前端开发",
+      "group": "页面开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "19-di-tu-yu-di-li-wei-zhi",
+      "title": "地图与地理位置",
+      "file": "19-di-tu-yu-di-li-wei-zhi.md",
+      "section": "前端开发",
+      "group": "页面开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "20-shi-shi-liao-tian-jie-mian",
+      "title": "实时聊天界面",
+      "file": "20-shi-shi-liao-tian-jie-mian.md",
+      "section": "前端开发",
+      "group": "页面开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "21-she-qu-zhao-pian-qiang",
+      "title": "社区照片墙",
+      "file": "21-she-qu-zhao-pian-qiang.md",
+      "section": "前端开发",
+      "group": "页面开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "22-express-lu-you-she-ji",
+      "title": "Express 路由设计",
+      "file": "22-express-lu-you-she-ji.md",
+      "section": "后端开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "23-jwt-ren-zheng-yu-shou-quan-zhong-jian-jian",
+      "title": "JWT 认证与授权中间件",
+      "file": "23-jwt-ren-zheng-yu-shou-quan-zhong-jian-jian.md",
+      "section": "后端开发",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "24-yong-hu-ren-zheng-api",
+      "title": "用户认证 API",
+      "file": "24-yong-hu-ren-zheng-api.md",
+      "section": "后端开发",
+      "group": "API 模块",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "25-tui-jian-pi-pei-api",
+      "title": "推荐匹配 API",
+      "file": "25-tui-jian-pi-pei-api.md",
+      "section": "后端开发",
+      "group": "API 模块",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "26-liao-tian-xiao-xi-api",
+      "title": "聊天消息 API",
+      "file": "26-liao-tian-xiao-xi-api.md",
+      "section": "后端开发",
+      "group": "API 模块",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "27-she-qu-yu-zhao-pian-api",
+      "title": "社区与照片 API",
+      "file": "27-she-qu-yu-zhao-pian-api.md",
+      "section": "后端开发",
+      "group": "API 模块",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "28-jing-ling-qiu-ji-fen-xi-tong-api",
+      "title": "精灵球积分系统 API",
+      "file": "28-jing-ling-qiu-ji-fen-xi-tong-api.md",
+      "section": "后端开发",
+      "group": "API 模块",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "29-wei-xin-deng-lu-ji-cheng",
+      "title": "微信登录集成",
+      "file": "29-wei-xin-deng-lu-ji-cheng.md",
+      "section": "后端开发",
+      "group": "API 模块",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "30-pi-pei-suan-fa-jia-gou",
+      "title": "匹配算法架构",
+      "file": "30-pi-pei-suan-fa-jia-gou.md",
+      "section": "AI 匹配系统",
+      "level": "Advanced"
+    },
+    {
+      "slug": "31-llm-zhi-neng-pi-pei-zhi-pu-ai",
+      "title": "LLM 智能匹配（智谱AI）",
+      "file": "31-llm-zhi-neng-pi-pei-zhi-pu-ai.md",
+      "section": "AI 匹配系统",
+      "level": "Advanced"
+    },
+    {
+      "slug": "32-chuan-tong-pi-pei-suan-fa-xing-qu-xing-ge-ju-chi",
+      "title": "传统匹配算法（兴趣/性格/距离）",
+      "file": "32-chuan-tong-pi-pei-suan-fa-xing-qu-xing-ge-ju-chi.md",
+      "section": "AI 匹配系统",
+      "level": "Advanced"
+    },
+    {
+      "slug": "33-tui-jian-fu-wu-yu-huan-cun",
+      "title": "推荐服务与缓存",
+      "file": "33-tui-jian-fu-wu-yu-huan-cun.md",
+      "section": "AI 匹配系统",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "34-shu-ju-ku-mo-shi-gai-lan",
+      "title": "数据库模式概览",
+      "file": "34-shu-ju-ku-mo-shi-gai-lan.md",
+      "section": "数据库设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "35-yong-hu-yu-zi-liao-biao-she-ji",
+      "title": "用户与资料表设计",
+      "file": "35-yong-hu-yu-zi-liao-biao-she-ji.md",
+      "section": "数据库设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "36-postgis-di-li-wei-zhi-cha-xun",
+      "title": "PostGIS 地理位置查询",
+      "file": "36-postgis-di-li-wei-zhi-cha-xun.md",
+      "section": "数据库设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "37-liao-tian-yu-she-qu-shu-ju-mo-xing",
+      "title": "聊天与社区数据模型",
+      "file": "37-liao-tian-yu-she-qu-shu-ju-mo-xing.md",
+      "section": "数据库设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "38-you-xi-hua-xi-tong-shu-ju-mo-xing",
+      "title": "游戏化系统数据模型",
+      "file": "38-you-xi-hua-xi-tong-shu-ju-mo-xing.md",
+      "section": "数据库设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "39-docker-rong-qi-hua-bu-shu",
+      "title": "Docker 容器化部署",
+      "file": "39-docker-rong-qi-hua-bu-shu.md",
+      "section": "部署与运维",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "40-docker-compose-bian-pai",
+      "title": "Docker Compose 编排",
+      "file": "40-docker-compose-bian-pai.md",
+      "section": "部署与运维",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "41-nginx-fan-xiang-dai-li-pei-zhi",
+      "title": "Nginx 反向代理配置",
+      "file": "41-nginx-fan-xiang-dai-li-pei-zhi.md",
+      "section": "部署与运维",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "42-sheng-chan-huan-jing-you-hua-jian-yi",
+      "title": "生产环境优化建议",
+      "file": "42-sheng-chan-huan-jing-you-hua-jian-yi.md",
+      "section": "部署与运维",
+      "level": "Advanced"
+    },
+    {
+      "slug": "43-openspec-bian-geng-guan-li",
+      "title": "OpenSpec 变更管理",
+      "file": "43-openspec-bian-geng-guan-li.md",
+      "section": "开发工作流",
+      "level": "Beginner"
+    },
+    {
+      "slug": "44-dai-ma-gui-fan-yu-git-gong-zuo-liu",
+      "title": "代码规范与 Git 工作流",
+      "file": "44-dai-ma-gui-fan-yu-git-gong-zuo-liu.md",
+      "section": "开发工作流",
+      "level": "Beginner"
+    }
+  ]
+}
