@@ -9,6 +9,8 @@ import { ChatPage } from './pages/ChatPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { PokeballPage } from './pages/PokeballPage';
 import { LobsterPage } from './pages/LobsterPage';
+import { LobsterChatPage } from './pages/LobsterChatPage';
+import { LobsterSkillPage } from './pages/LobsterSkillPage';
 import { SubscriptionPage } from './pages/SubscriptionPage';
 import { ConsentPage } from './pages/ConsentPage';
 import { IntroductionPage } from './pages/IntroductionPage';
@@ -119,6 +121,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/lobster/skill"
+        element={
+          <ProtectedRoute>
+            <LobsterSkillPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/subscription"
         element={
           <ProtectedRoute>
@@ -139,6 +149,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <IntroductionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/lobster/chat"
+        element={
+          <ProtectedRoute>
+            <LobsterChatPage />
           </ProtectedRoute>
         }
       />

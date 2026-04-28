@@ -1,5 +1,7 @@
 const pool = require('../db');
 const { calculateMatchScore, generateIcebreakers } = require('./matchingAlgorithm');
+const conversationService = require('./lobsterConversationService');
+const crypto = require('./crypto');
 
 /**
  * Lobster Agent Orchestrator
@@ -123,28 +125,69 @@ class LobsterOrchestrator {
 
         const c = chat.rows[0];
 
-        // Use existing algorithm to get base score
-        const lobsterA = await pool.query(`SELECT owner_id FROM lobsters WHERE lobster_id = $1`, [c.lobster_a_id]);
-        const lobsterB = await pool.query(`SELECT owner_id FROM lobsters WHERE lobster_id = $1`, [c.lobster_b_id]);
+        // Get lobster details for analysis
+        const lobsterA = await pool.query(`SELECT * FROM lobsters WHERE lobster_id = $1`, [c.lobster_a_id]);
+        const lobsterB = await pool.query(`SELECT * FROM lobsters WHERE lobster_id = $1`, [c.lobster_b_id]);
 
         if (lobsterA.rows.length === 0 || lobsterB.rows.length === 0) return null;
 
-        const score = await calculateMatchScore(lobsterA.rows[0].owner_id, lobsterB.rows[0].owner_id);
+        // Get preferences for icebreaker generation (ISC-30)
+        const [prefsA, prefsB] = await Promise.all([
+            pool.query(`SELECT * FROM lobster_preferences WHERE lobster_id = $1`, [c.lobster_a_id]),
+            pool.query(`SELECT * FROM lobster_preferences WHERE lobster_id = $1`, [c.lobster_b_id])
+        ]);
+
+        // Generate LLM-based compatibility analysis from conversation messages
+        const messages = c.messages || [];
+        let analysis = null;
+        let score = c.compatibility_score;
+        let icebreakers = null;
+
+        if (messages.length >= 2) {
+            try {
+                const evalResult = await conversationService.evaluateConversation(
+                    messages,
+                    { name: lobsterA.rows[0].name, conversation_style: lobsterA.rows[0].conversation_style },
+                    { name: lobsterB.rows[0].name, conversation_style: lobsterB.rows[0].conversation_style }
+                );
+                score = evalResult.score;
+                analysis = evalResult.analysis;
+
+                // Generate icebreakers from preference overlap
+                icebreakers = await conversationService.generateIcebreakers(
+                    prefsA.rows[0] || null,
+                    prefsB.rows[0] || null,
+                    lobsterA.rows[0].name,
+                    lobsterB.rows[0].name
+                );
+            } catch (err) {
+                console.error('[LobsterOrchestrator] LLM evaluation failed:', err.message);
+            }
+        }
+
+        // Fallback: use existing algorithm if no LLM analysis
+        if (score === null || score === undefined) {
+            const ownerA = await pool.query(`SELECT owner_id FROM lobsters WHERE lobster_id = $1`, [c.lobster_a_id]);
+            const ownerB = await pool.query(`SELECT owner_id FROM lobsters WHERE lobster_id = $1`, [c.lobster_b_id]);
+            score = await calculateMatchScore(ownerA.rows[0].owner_id, ownerB.rows[0].owner_id);
+        }
 
         await pool.query(`
             UPDATE lobster_chats
             SET compatibility_score = $1,
+                compatibility_analysis = $2,
+                icebreaker_messages = $3,
                 session_status = 'completed',
-                outcome = CASE WHEN $1 >= 65 THEN 'recommended' ELSE 'rejected' END
-            WHERE chat_id = $2
-        `, [score, chatId]);
+                outcome = CASE WHEN $1 >= 70 THEN 'recommended' ELSE 'rejected' END
+            WHERE chat_id = $4
+        `, [score, analysis, icebreakers ? JSON.stringify(icebreakers) : null, chatId]);
 
-        // If score is high enough, recommend to owner
-        if (score >= 65) {
+        // If score is high enough, recommend to owner (ISC-29: threshold >70)
+        if (score >= 70) {
             await this.recommendToOwner(chatId);
         }
 
-        return { chatId, score, outcome: score >= 65 ? 'recommended' : 'rejected' };
+        return { chatId, score, analysis, icebreakers, outcome: score >= 70 ? 'recommended' : 'rejected' };
     }
 
     /**
@@ -273,12 +316,16 @@ class LobsterOrchestrator {
         const chat = await pool.query(`SELECT * FROM lobster_chats WHERE chat_id = $1`, [c.chat_id]);
         const c_chat = chat.rows[0];
 
-        // Create introduction record
+        // Encrypt WeChat IDs at rest (ISC-26, ISC-33)
+        const encryptedWechatA = crypto.encrypt(userAMatch.wechat_id);
+        const encryptedWechatB = crypto.encrypt(userBMatch.wechat_id);
+
+        // Create introduction record with encrypted WeChat IDs
         const intro = await pool.query(`
             INSERT INTO introductions (consent_id, lobster_a_id, lobster_b_id, owner_a_wechat_id, owner_b_wechat_id)
             VALUES ($1, $2, $3, $4, $5)
             RETURNING introduction_id
-        `, [consentId, c_chat.lobster_a_id, c_chat.lobster_b_id, userAMatch.wechat_id, userBMatch.wechat_id]);
+        `, [consentId, c_chat.lobster_a_id, c_chat.lobster_b_id, encryptedWechatA, encryptedWechatB]);
 
         // Update consent
         await pool.query(`

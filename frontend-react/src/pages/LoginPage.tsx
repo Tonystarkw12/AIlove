@@ -62,10 +62,10 @@ export function LoginPage() {
       <div className="pokemon-card p-8 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4 animate-bounce">🎮</div>
-          <h1 className="text-3xl font-bold mb-2">AIlove</h1>
+          <div className="text-6xl mb-4 animate-bounce">🦞</div>
+          <h1 className="text-3xl font-bold mb-2">LobLove</h1>
           <p className="text-gray-600 text-sm">
-            欢迎来到AIlove，快使用精灵球捕获你心仪的对象吧！！
+            龙虾红娘，AI替你牵线搭桥
           </p>
           <div className="w-full h-1 bg-black mt-4 rounded" />
         </div>

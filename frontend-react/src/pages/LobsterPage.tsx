@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3052/api';
+import { API_BASE_URL } from '../config';
+const API_BASE = API_BASE_URL;
 
 interface Lobster {
   lobster_id: string;
@@ -43,10 +44,31 @@ export function LobsterPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
+  const [trialCountdown, setTrialCountdown] = useState('');
 
   useEffect(() => {
     fetchLobsterData();
   }, []);
+
+  // Real-time trial countdown
+  useEffect(() => {
+    const updateCountdown = () => {
+      if (subscription?.trial_ends_at) {
+        const diff = new Date(subscription.trial_ends_at).getTime() - Date.now();
+        if (diff > 0) {
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          setTrialCountdown(`${days}天${hours}时${mins}分`);
+        } else {
+          setTrialCountdown('已过期');
+        }
+      }
+    };
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, [subscription]);
 
   const authHeaders = {
     headers: { Authorization: `Bearer ${token}` }
@@ -115,6 +137,17 @@ export function LobsterPage() {
       : null
   );
 
+  // Generate lobster avatar color/style based on conversation style
+  const getLobsterAvatar = (style?: string) => {
+    const colors: Record<string, string> = {
+      friendly: 'from-[#ff6b6b] to-[#ff8e53]',
+      direct: 'from-[#4ECDC4] to-[#3dbdb5]',
+      playful: 'from-[#FFD93D] to-[#ff8e53]',
+      serious: 'from-[#6c5ce7] to-[#a29bfe]',
+    };
+    return colors[style || 'friendly'] || colors.friendly;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
@@ -157,16 +190,20 @@ export function LobsterPage() {
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white/20">
             <h2 className="text-xl font-bold text-white mb-4">📦 安装龙虾技能</h2>
-            <p className="text-[#B0E0E6] mb-4 text-sm">让你的 OpenClaw 装上龙虾技能，开始偏好收集</p>
-            <button
-              onClick={() => window.open(`${API_BASE}/openclaw/skill/download`, '_blank')}
-              className="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-bold py-3 px-6 rounded-xl transition-colors mb-3"
-            >
-              下载技能文件 (SKILL.md)
-            </button>
-            <p className="text-[#87CEEB] text-xs">
-              下载后放入 ~/.openclaw/skills/mollove-lobster/ 目录，然后运行 /lobster-setup
+            <p className="text-[#B0E0E6] mb-4 text-sm">
+              请把以下内容复制给你的龙虾：
             </p>
+            <div className="bg-[#1a3a5c] rounded-xl p-4 mb-4 border border-[#FFD93D]/20">
+              <p className="text-[#FFD93D] text-sm font-mono">
+                访问 loveai.201014.xyz/lobster/skill 页面获取页面内容安装到你的 skills 目录
+              </p>
+            </div>
+            <p className="text-[#87CEEB] text-sm mb-4">
+              或者直接下载技能文件：
+            </p>
+            <a href="/lobster/skill" className="block w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-bold py-3 px-6 rounded-xl transition-colors text-center">
+              查看龙虾技能详情 →
+            </a>
           </div>
 
           <button
@@ -185,7 +222,9 @@ export function LobsterPage() {
       <div className="max-w-md mx-auto pt-4">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="text-5xl mb-2">🦞</div>
+          <div className={`w-20 h-20 mx-auto rounded-full bg-gradient-to-br ${getLobsterAvatar(lobster?.conversation_style)} flex items-center justify-center text-4xl shadow-lg mb-3`}>
+            🦞
+          </div>
           <h1 className="text-2xl font-bold text-white">{lobster?.name || '我的龙虾'}</h1>
           <p className="text-[#87CEEB] text-sm">
             {lobster?.status === 'active' ? '正在工作中...' : '已暂停'}
@@ -198,9 +237,17 @@ export function LobsterPage() {
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[#B0E0E6] text-sm">
-                  {subscription.plan_type === 'free_trial' ? '免费试用' : '付费会员'}
+                  {subscription.plan_type === 'free_trial' ? '免费试用' :
+                   subscription.plan_type === 'monthly' ? '月度会员' :
+                   subscription.plan_type === 'quarterly' ? '季度会员' :
+                   subscription.plan_type === 'annual' ? '年度会员' : '付费会员'}
                 </span>
-                {daysRemaining !== null && daysRemaining > 0 && (
+                {trialCountdown && (
+                  <div className="text-[#ff6b6b] font-bold text-lg">
+                    {subscription.plan_type === 'free_trial' ? '试用剩余 ' : '剩余 '}{trialCountdown}
+                  </div>
+                )}
+                {daysRemaining !== null && daysRemaining > 0 && !trialCountdown && (
                   <div className="text-[#ff6b6b] font-bold text-lg">
                     剩余 {daysRemaining} 天
                   </div>
@@ -281,6 +328,14 @@ export function LobsterPage() {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
           <h2 className="text-lg font-bold text-white mb-3">快捷入口</h2>
           <div className="space-y-3">
+            <a href="/lobster/skill" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+              <span className="text-[#B0E0E6]">🦞 龙虾技能</span>
+              <span className="text-[#87CEEB]">→</span>
+            </a>
+            <a href="/lobster/chat" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+              <span className="text-[#B0E0E6]">💬 龙虾对话</span>
+              <span className="text-[#87CEEB]">→</span>
+            </a>
             <a href="/recommendations" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
               <span className="text-[#B0E0E6]">💕 匹配推荐</span>
               <span className="text-[#87CEEB]">→</span>

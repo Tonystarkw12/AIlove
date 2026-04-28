@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
+const crypto = require('../services/crypto');
 
 const authenticate = (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
@@ -29,12 +30,16 @@ router.get('/me', authenticate, async (req, res) => {
             ORDER BY i.created_at DESC
         `, [req.userId]);
 
-        // Mask WeChat IDs (show only partial)
-        const masked = result.rows.map(r => ({
-            ...r,
-            owner_a_wechat_id: r.owner_a_wechat_id ? maskWeChat(r.owner_a_wechat_id) : null,
-            owner_b_wechat_id: r.owner_b_wechat_id ? maskWeChat(r.owner_b_wechat_id) : null
-        }));
+        // Decrypt and mask WeChat IDs
+        const masked = result.rows.map(r => {
+            const decryptedA = r.owner_a_wechat_id ? crypto.decrypt(r.owner_a_wechat_id) : null;
+            const decryptedB = r.owner_b_wechat_id ? crypto.decrypt(r.owner_b_wechat_id) : null;
+            return {
+                ...r,
+                owner_a_wechat_id: decryptedA ? maskWeChat(decryptedA) : null,
+                owner_b_wechat_id: decryptedB ? maskWeChat(decryptedB) : null
+            };
+        });
 
         res.json({ introductions: masked });
     } catch (err) {
@@ -47,6 +52,37 @@ function maskWeChat(wechatId) {
     if (wechatId.length <= 4) return wechatId;
     return wechatId.substring(0, 2) + '***' + wechatId.substring(wechatId.length - 2);
 }
+
+// POST /api/introductions/:id/reveal-wechat - Reveal decrypted WeChat ID
+router.post('/:id/reveal-wechat', authenticate, async (req, res) => {
+    try {
+        const intro = await pool.query(`
+            SELECT i.*, c.owner_a_id, c.owner_b_id
+            FROM introductions i
+            JOIN consents c ON i.consent_id = c.consent_id
+            WHERE i.introduction_id = $1
+        `, [req.params.id]);
+
+        if (intro.rows.length === 0) return res.status(404).json({ error: 'Introduction not found' });
+
+        const i = intro.rows[0];
+        const isOwnerA = i.owner_a_id === req.userId;
+
+        if (!isOwnerA && i.owner_b_id !== req.userId) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Decrypt the OTHER party's WeChat ID for this user
+        const otherWechat = isOwnerA
+            ? (i.owner_b_wechat_id ? crypto.decrypt(i.owner_b_wechat_id) : null)
+            : (i.owner_a_wechat_id ? crypto.decrypt(i.owner_a_wechat_id) : null);
+
+        res.json({ wechatId: otherWechat });
+    } catch (err) {
+        console.error('Error revealing WeChat ID:', err);
+        res.status(500).json({ error: 'Failed to reveal WeChat ID' });
+    }
+});
 
 // POST /api/introductions/:id/feedback - Submit post-introduction feedback
 router.post('/:id/feedback', authenticate, async (req, res) => {

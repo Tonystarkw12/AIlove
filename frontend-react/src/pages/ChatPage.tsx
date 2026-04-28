@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { WS_URL } from '../config';
 
 interface Message {
   message_id: string;
@@ -71,7 +72,7 @@ export function ChatPage() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    const wsUrl = `ws://localhost:3052/ws/chat?token=${token}`;
+    const wsUrl = `${WS_URL}?token=${token}`;
     const websocket = new WebSocket(wsUrl);
 
     websocket.onopen = () => {

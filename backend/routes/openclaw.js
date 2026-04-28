@@ -69,7 +69,7 @@ router.get('/skill/download', (req, res) => {
 // PUBLIC: GET /api/openclaw/skill/raw - Download raw SKILL.md file
 router.get('/skill/raw', (req, res) => {
     try {
-        const skillPath = path.join(__dirname, '../../../openclaw-skill/mollove-lobster/SKILL.md');
+        const skillPath = path.join(__dirname, '../../openclaw-skill/mollove-lobster/SKILL.md');
         if (!fs.existsSync(skillPath)) {
             return res.status(404).json({ error: 'Skill file not found' });
         }

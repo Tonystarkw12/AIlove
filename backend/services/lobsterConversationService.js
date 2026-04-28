@@ -110,6 +110,65 @@ Respond in JSON format: {"score": 0-100, "analysis": "text", "strengths": ["item
     }
 
     /**
+     * Generate icebreaker messages from lobster preference overlap (ISC-30)
+     */
+    async generateIcebreakers(lobsterAPrefs, lobsterBPrefs, lobsterAName, lobsterBName) {
+        const aValues = lobsterAPrefs?.owner_values || {};
+        const bValues = lobsterBPrefs?.owner_values || {};
+
+        const overlaps = [];
+        const categories = ['hobbies', 'interests', 'music', 'movies', 'food', 'travel', 'sports'];
+        for (const cat of categories) {
+            const aList = Array.isArray(aValues[cat]) ? aValues[cat] : (aValues[cat] ? [aValues[cat]] : []);
+            const bList = Array.isArray(bValues[cat]) ? bValues[cat] : (bValues[cat] ? [bValues[cat]] : []);
+            const common = aList.filter(x => bList.includes(x));
+            if (common.length > 0) {
+                overlaps.push({ category: cat, items: common });
+            }
+        }
+
+        if (this.openai && overlaps.length > 0) {
+            try {
+                const response = await this.openai.chat.completions.create({
+                    model: process.env.OPENAI_MODEL || 'glm-4.7',
+                    messages: [
+                        { role: 'system', content: 'Generate 3 personalized icebreaker conversation starters in Chinese based on shared interests between two people. Keep them natural and fun. Return JSON: {"icebreakers": ["text1", "text2", "text3"]}' },
+                        { role: 'user', content: `${lobsterAName}的主人喜欢: ${JSON.stringify(aValues)}\n${lobsterBName}的主人喜欢: ${JSON.stringify(bValues)}\n共同话题: ${JSON.stringify(overlaps)}` }
+                    ],
+                    response_format: { type: 'json_object' },
+                    max_tokens: 300,
+                });
+
+                const result = JSON.parse(response.choices[0].message.content);
+                return result.icebreakers || this.defaultIcebreakers(overlaps);
+            } catch (err) {
+                console.error('[LobsterConversation] Icebreaker generation failed:', err.message);
+            }
+        }
+
+        return this.defaultIcebreakers(overlaps);
+    }
+
+    defaultIcebreakers(overlaps) {
+        const templates = [
+            '听说你们都喜欢同样的事情，真是太巧了！',
+            '你们的主人有很多共同话题呢，要不要聊聊旅行经历？',
+            '看起来你们都很热爱生活，有什么最近开心的事分享吗？',
+        ];
+
+        if (overlaps.length > 0) {
+            const first = overlaps[0];
+            return [
+                `听说你们都喜欢${first.items.join('、')}，有什么推荐的吗？`,
+                `我主人也对${first.items[0]}很感兴趣，能聊聊你的经验吗？`,
+                `看来你们有很多共同爱好！除了${first.items.join('、')}，还喜欢什么？`,
+            ];
+        }
+
+        return templates;
+    }
+
+    /**
      * Generate a summary of the conversation for the owner
      */
     async generateSummaryForOwner(messages, lobster) {

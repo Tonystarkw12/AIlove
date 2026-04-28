@@ -30,6 +30,10 @@ app.use('/music', express.static(path.join(__dirname, '../music')));
 app.use('/pictures', express.static(path.join(__dirname, '../pictures')));
 
 // Database Connection is now handled in db.js
+const rateLimiter = require('./middleware/rateLimiter');
+
+// Apply rate limiting globally (120 req/min per IP)
+app.use(rateLimiter(120, 60000));
 
 // Basic Route
 app.get('/', (req, res) => {

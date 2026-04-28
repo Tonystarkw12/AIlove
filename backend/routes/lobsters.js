@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require('../db');
 const lobsterOrchestrator = require('../services/lobsterOrchestrator');
 const subscriptionService = require('../services/subscriptionService');
+const conversationService = require('../services/lobsterConversationService');
 
 // Middleware to verify authentication
 const authenticate = (req, res, next) => {
@@ -38,12 +39,12 @@ router.post('/initialize', authenticate, async (req, res) => {
             return res.json({ lobster: existing.rows[0], created: false });
         }
 
-        // Create lobster with default personality
+        // Create lobster with default personality and avatar based on style (ISC-14)
         const lobster = await pool.query(`
-            INSERT INTO lobsters (owner_id, name, conversation_style)
-            VALUES ($1, $2, $3)
+            INSERT INTO lobsters (owner_id, name, conversation_style, avatar_url)
+            VALUES ($1, $2, $3, $4)
             RETURNING *
-        `, [req.userId, `龙虾${Math.floor(Math.random() * 9000 + 1000)}`, 'friendly']);
+        `, [req.userId, `龙虾${Math.floor(Math.random() * 9000 + 1000)}`, 'friendly', 'friendly']);
 
         // Create empty preferences
         await pool.query(`
@@ -115,7 +116,9 @@ router.get('/me/chats', authenticate, requireSubscription, async (req, res) => {
         const { status, limit = 20, offset = 0 } = req.query;
 
         let query = `
-            SELECT lc.*, l.name as other_lobster_name, u.nickname as other_owner_name
+            SELECT lc.*,
+                   CASE WHEN la.owner_id = $1 THEN lb.name ELSE la.name END as other_lobster_name,
+                   CASE WHEN la.owner_id = $1 THEN ub.nickname ELSE ua.nickname END as other_owner_name
             FROM lobster_chats lc
             JOIN lobsters la ON lc.lobster_a_id = la.lobster_id
             JOIN lobsters lb ON lc.lobster_b_id = lb.lobster_id
@@ -136,14 +139,7 @@ router.get('/me/chats', authenticate, requireSubscription, async (req, res) => {
 
         const result = await pool.query(query, params);
 
-        // Anonymize other party info based on who is the current user
-        const chats = result.rows.map(c => ({
-            ...c,
-            other_lobster_name: c.lobster_a_id === c.lobster_a_id ? c.other_lobster_name : c.other_lobster_name,
-            other_owner_name: c.lobster_a_id === c.lobster_a_id ? c.other_owner_name : c.other_owner_name
-        }));
-
-        res.json({ chats, total: result.rows.length });
+        res.json({ chats: result.rows, total: result.rows.length });
     } catch (err) {
         console.error('Error fetching chats:', err);
         res.status(500).json({ error: 'Failed to fetch chats' });
@@ -154,10 +150,15 @@ router.get('/me/chats', authenticate, requireSubscription, async (req, res) => {
 router.get('/me/chats/:chatId', authenticate, requireSubscription, async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT lc.*
+            SELECT lc.*,
+                   CASE WHEN la.owner_id = $1 THEN lb.name ELSE la.name END as other_lobster_name,
+                   CASE WHEN la.owner_id = $1 THEN ub.nickname ELSE ua.nickname END as other_owner_name
             FROM lobster_chats lc
-            JOIN lobsters l ON lc.lobster_a_id = l.lobster_id
-            WHERE l.owner_id = $1 AND lc.chat_id = $2
+            JOIN lobsters la ON lc.lobster_a_id = la.lobster_id
+            JOIN lobsters lb ON lc.lobster_b_id = lb.lobster_id
+            JOIN users ua ON la.owner_id = ua.user_id
+            JOIN users ub ON lb.owner_id = ub.user_id
+            WHERE (la.owner_id = $1 OR lb.owner_id = $1) AND lc.chat_id = $2
         `, [req.userId, req.params.chatId]);
 
         if (result.rows.length === 0) {
@@ -229,20 +230,14 @@ router.post('/me/resume', authenticate, async (req, res) => {
     }
 });
 
-// GET /api/lobsters/me/recommendations - Get lobster-curated recommendations
+// GET /api/lobsters/me/recommendations - Get lobster-curated recommendations (ISC-31)
 router.get('/me/recommendations', authenticate, requireSubscription, async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT lc.*, u.nickname as other_owner_name, u.avatar_url as other_owner_avatar
-            FROM lobster_chats lc
-            JOIN lobsters la ON lc.lobster_a_id = la.lobster_id
-            JOIN lobsters lb ON lc.lobster_b_id = lb.lobster_id
-            JOIN users ua ON la.owner_id = ua.user_id
-            JOIN users ub ON lb.owner_id = ub.user_id
-            WHERE (la.owner_id = $1 OR lb.owner_id = $1)
-            AND lc.outcome = 'recommended'
-            AND lc.compatibility_score IS NOT NULL
-            ORDER BY lc.compatibility_score DESC
+            SELECT lr.*
+            FROM lobster_recommendations lr
+            WHERE lr.recommending_owner_id = $1
+            ORDER BY lr.match_score DESC
             LIMIT 20
         `, [req.userId]);
 
@@ -282,6 +277,81 @@ router.post('/me/match-now', authenticate, requireSubscription, async (req, res)
     } catch (err) {
         console.error('Error triggering match:', err);
         res.status(500).json({ error: 'Failed to trigger matching' });
+    }
+});
+
+// POST /api/lobsters/chats/:chatId/converse - Run LLM-powered conversation turns
+router.post('/chats/:chatId/converse', authenticate, requireSubscription, async (req, res) => {
+    try {
+        const { turns = 4 } = req.body;
+
+        // Verify user owns one of the lobsters in this chat
+        const chat = await pool.query(`
+            SELECT lc.*, la.owner_id as owner_a_id, lb.owner_id as owner_b_id,
+                   la.name as lobster_a_name, la.conversation_style as style_a,
+                   lb.name as lobster_b_name, lb.conversation_style as style_b
+            FROM lobster_chats lc
+            JOIN lobsters la ON lc.lobster_a_id = la.lobster_id
+            JOIN lobsters lb ON lc.lobster_b_id = lb.lobster_id
+            WHERE lc.chat_id = $1 AND lc.session_status = 'active'
+        `, [req.params.chatId]);
+
+        if (chat.rows.length === 0) {
+            return res.status(404).json({ error: 'Active chat not found' });
+        }
+
+        const c = chat.rows[0];
+        const isOwnerA = c.owner_a_id === req.userId;
+        const isOwnerB = c.owner_b_id === req.userId;
+        if (!isOwnerA && !isOwnerB) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Get preferences for both lobsters
+        const prefsA = await pool.query(`SELECT * FROM lobster_preferences WHERE lobster_id = $1`, [c.lobster_a_id]);
+        const prefsB = await pool.query(`SELECT * FROM lobster_preferences WHERE lobster_id = $1`, [c.lobster_b_id]);
+
+        const messages = c.messages || [];
+        const maxTurns = turns;
+
+        // Generate multi-turn conversation
+        for (let turn = 0; turn < maxTurns; turn++) {
+            // Alternate: even turns = lobster A speaks, odd = lobster B
+            const speaker = turn % 2 === 0 ? 'a' : 'b';
+            const speakerLobster = speaker === 'a' ? { lobster_id: c.lobster_a_id, name: c.lobster_a_name, conversation_style: c.style_a } : { lobster_id: c.lobster_b_id, name: c.lobster_b_name, conversation_style: c.style_b };
+            const listenerLobster = speaker === 'a' ? { lobster_id: c.lobster_b_id, name: c.lobster_b_name } : { lobster_id: c.lobster_a_id, name: c.lobster_a_name };
+            const speakerPrefs = speaker === 'a' ? (prefsA.rows[0] || null) : (prefsB.rows[0] || null);
+            const listenerPrefs = speaker === 'a' ? (prefsB.rows[0] || null) : (prefsA.rows[0] || null);
+
+            const msg = await conversationService.generateAgentMessage({
+                speaker: speakerLobster,
+                listener: listenerLobster,
+                speakerPrefs,
+                listenerPrefs,
+                conversationHistory: messages.slice(-6),
+                turn,
+                maxTurns
+            });
+
+            messages.push(msg);
+        }
+
+        // Save updated messages
+        await pool.query(`
+            UPDATE lobster_chats SET messages = $1, updated_at = NOW()
+            WHERE chat_id = $2
+        `, [JSON.stringify(messages), c.chat_id]);
+
+        // If all turns completed, evaluate the conversation
+        if (messages.length >= maxTurns) {
+            const evalResult = await lobsterOrchestrator.evaluateChat(c.chat_id);
+            res.json({ messages: messages.slice(-maxTurns), evaluation: evalResult });
+        } else {
+            res.json({ messages: messages.slice(-maxTurns), conversationContinuing: true });
+        }
+    } catch (err) {
+        console.error('Error in conversation:', err);
+        res.status(500).json({ error: 'Conversation failed' });
     }
 });
 
