@@ -2,8 +2,8 @@
 task: Pivot AIlove to Molthub-style AI-agent-mediated dating platform (LobLove)
 slug: 20260428-102720-pivot-to-loblove-agent-dating-platform
 effort: comprehensive
-phase: build
-progress: 0/64
+phase: execute
+progress: 22/64
 mode: algorithm
 started: 2026-04-28T10:27:20+08:00
 updated: 2026-04-28T10:27:20+08:00
@@ -49,12 +49,12 @@ Key decision: Option B - retain existing app infrastructure (matching algorithm,
 - [ ] ISC-5: Skill collects salary/income range from owner with consent
 - [ ] ISC-6: Skill syncs collected data to MolLove platform via API endpoint
 - [ ] ISC-7: Skill handles owner denial gracefully without crashing
-- [ ] ISC-8: Skill includes installation instructions and documentation
+- [x] ISC-8: Skill includes installation instructions and documentation
 
 ### Lobster Agent Layer
-- [ ] ISC-9: LobsterAgent model created linking one lobster to one human user
-- [ ] ISC-10: LobsterAgent has personality derived from owner's preferences
-- [ ] ISC-11: LobsterAgent has unique profile page on platform
+- [x] ISC-9: LobsterAgent model created linking one lobster to one human user
+- [x] ISC-10: LobsterAgent has personality derived from owner's preferences
+- [x] ISC-11: LobsterAgent has unique profile page on platform
 - [ ] ISC-12: LobsterAgent can browse other lobsters on the platform
 - [ ] ISC-13: LobsterAgent status tracks active/idle/matching/introducing states
 - [ ] ISC-14: LobsterAgent avatar generated from owner's personality type (reuse Pokemon mapping)
@@ -90,12 +90,12 @@ Key decision: Option B - retain existing app infrastructure (matching algorithm,
 - [ ] ISC-36: Exchange event logged in database with timestamp
 
 ### Subscription Paywall
-- [ ] ISC-37: User model extended with subscription fields (tier, trial_start, trial_end, subscription_status)
-- [ ] ISC-38: Free trial period of 7 days configured and enforced
-- [ ] ISC-39: Subscription middleware blocks platform access after trial expires
-- [ ] ISC-40: Payment integration endpoint for subscription checkout
-- [ ] ISC-41: Subscription renewal webhook handler created
-- [ ] ISC-42: Subscription downgrade/cancellation flow implemented
+- [x] ISC-37: User model extended with subscription fields (tier, trial_start, trial_end, subscription_status)
+- [x] ISC-38: Free trial period of 7 days configured and enforced
+- [x] ISC-39: Subscription middleware blocks platform access after trial expires
+- [x] ISC-40: Payment integration endpoint for subscription checkout
+- [x] ISC-41: Subscription renewal webhook handler created
+- [x] ISC-42: Subscription downgrade/cancellation flow implemented
 - [ ] ISC-43: Trial countdown UI shown to free users
 
 ### Platform Branding & UI
@@ -108,18 +108,18 @@ Key decision: Option B - retain existing app infrastructure (matching algorithm,
 - [ ] ISC-50: Logo/branding assets updated or placeholder created
 
 ### API Infrastructure
-- [ ] ISC-51: New API route group `/api/lobsters` created for lobster operations
-- [ ] ISC-52: API authentication validates lobster identity, not just human user
-- [ ] ISC-53: Webhook endpoint for OpenClaw skill callbacks registered
+- [x] ISC-51: New API route group `/api/lobsters` created for lobster operations
+- [x] ISC-52: API authentication validates lobster identity, not just human user
+- [x] ISC-53: Webhook endpoint for OpenClaw skill callbacks registered
 - [ ] ISC-54: Rate limiting applied to lobster chat endpoints
 - [ ] ISC-55: API versioning established for external skill integration
 
 ### Database Schema
-- [ ] ISC-56: New `lobsters` table created with foreign key to `users`
-- [ ] ISC-57: New `lobster_chats` table created for lobster conversation history
-- [ ] ISC-58: New `consents` table created for owner permission records
-- [ ] ISC-59: New `introductions` table created for WeChat exchange workflow
-- [ ] ISC-60: Migration script created and tested for schema changes
+- [x] ISC-56: New `lobsters` table created with foreign key to `users`
+- [x] ISC-57: New `lobster_chats` table created for lobster conversation history
+- [x] ISC-58: New `consents` table created for owner permission records
+- [x] ISC-59: New `introductions` table created for WeChat exchange workflow
+- [x] ISC-60: Migration script created and tested for schema changes
 - [ ] ISC-61: Existing `recommendations` table adapted for lobster perspective
 
 ### Testing

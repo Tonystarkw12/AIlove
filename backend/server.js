@@ -48,6 +48,12 @@ const rewardsRoutes = require('./routes/rewards'); // Phase 4: 积分奖励路�
 const communityRoutes = require('./routes/community'); // Phase 3: 社区照片墙路由
 const pokeballRoutes = require('./routes/pokeball'); // 精灵球系统路由
 const matchesRoutes = require('./routes/matches'); // 用户匹配记录路由
+// LobLove System Routes
+const lobsterRoutes = require('./routes/lobsters');
+const consentRoutes = require('./routes/consents');
+const subscriptionRoutes = require('./routes/subscriptions');
+const introductionRoutes = require('./routes/introductions');
+const openclawRoutes = require('./routes/openclaw');
 const wechatAuthRoutes = require('./routes/wechatAuth'); // 微信认证路由
 
 app.use('/api/auth', authRoutes);
@@ -62,6 +68,13 @@ app.use('/api/rewards', rewardsRoutes); // Phase 4: 积分奖励 API
 app.use('/api/community', communityRoutes); // Phase 3: 社区照片墙 API
 app.use('/api/pokeball', pokeballRoutes); // 精灵球系统 API
 app.use('/api/users', matchesRoutes); // 用户匹配记录 API
+
+// LobLove System API
+app.use('/api/lobsters', lobsterRoutes);
+app.use('/api/consents', consentRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/introductions', introductionRoutes);
+app.use('/api/openclaw', openclawRoutes);
 
 // WebSocket Server Setup
 const { initializeWebSocketServer, sendMessageToUser } = require('./services/websocketService');
@@ -78,6 +91,10 @@ app.use(errorLogger);
 // Start Server
 server.listen(port, () => { // Use server.listen instead of app.listen for WebSocket
   console.log(`Server (HTTP & WebSocket) listening on port ${port}`);
+
+  // Start Lobster Agent Scheduler
+  const lobsterScheduler = require('./services/lobsterScheduler');
+  lobsterScheduler.start();
 });
 
 module.exports = { app, server, wss, sendMessageToUser }; // Export server and WebSocket utilities (pool is no longer defined here)

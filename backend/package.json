@@ -16,6 +16,7 @@
     "geolib": "^3.3.4",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
     "openai": "^6.16.0",
     "pg": "^8.11.3",
     "redis": "^5.10.0",
