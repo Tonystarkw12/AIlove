@@ -8,9 +8,9 @@ interface TabItem {
 
 const tabs: TabItem[] = [
   { path: '/', label: '首页', icon: '🏠' },
+  { path: '/lobster', label: '龙虾', icon: '🦞' },
   { path: '/map', label: '发现', icon: '📍' },
   { path: '/chat', label: '聊天', icon: '💬' },
-  { path: '/community', label: '社区', icon: '💕' },
   { path: '/profile', label: '我的', icon: '👤' },
 ];
 

@@ -17,6 +17,72 @@ const authenticate = (req, res, next) => {
     }
 };
 
+// PUBLIC: GET /api/openclaw/skill/download - Download the OpenClaw skill package
+router.get('/skill/download', (req, res) => {
+    try {
+        const skillPath = path.join(__dirname, '../../openclaw-skill/mollove-lobster');
+        if (!fs.existsSync(skillPath)) {
+            return res.status(404).json({ error: 'Skill package not found' });
+        }
+
+        // Read SKILL.md
+        const skillContent = fs.readFileSync(path.join(skillPath, 'SKILL.md'), 'utf-8');
+
+        // Parse frontmatter for metadata
+        const frontmatterMatch = skillContent.match(/^---\n([\s\S]*?)\n---/);
+        let metadata = {};
+        if (frontmatterMatch) {
+            const frontmatter = frontmatterMatch[1];
+            const nameMatch = frontmatter.match(/name:\s*(.+)/);
+            const versionMatch = frontmatter.match(/version:\s*(.+)/);
+            const descMatch = frontmatter.match(/description:\s*(.+)/);
+            if (nameMatch) metadata.name = nameMatch[1].trim();
+            if (versionMatch) metadata.version = versionMatch[1].trim();
+            if (descMatch) metadata.description = descMatch[1].trim();
+        }
+
+        // Generate the API URL from environment
+        const apiUrl = process.env.MOLLOVE_API_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
+        const backendUrl = process.env.BACKEND_URL || 'http://localhost:3052';
+
+        // Return skill info for the install page
+        res.json({
+            name: metadata.name || 'mollove_lobster',
+            version: metadata.version || '1.0.0',
+            description: metadata.description || 'MolLove Lobster AI agent skill',
+            install_command: `curl -L ${backendUrl}/api/openclaw/skill/raw -o SKILL.md`,
+            manual_url: `${backendUrl}/api/openclaw/skill/raw`,
+            platform_url: apiUrl,
+            setup_steps: [
+                '1. Open your OpenClaw terminal',
+                `2. Run: openclaw skills install mollove-lobster --source ${backendUrl}/api/openclaw/skill/raw`,
+                '3. Or manually: Copy the SKILL.md content to ~/.openclaw/skills/mollove-lobster/',
+                '4. Run /lobster-setup to start preference collection',
+            ]
+        });
+    } catch (err) {
+        console.error('Error fetching skill info:', err);
+        res.status(500).json({ error: 'Failed to fetch skill package' });
+    }
+});
+
+// PUBLIC: GET /api/openclaw/skill/raw - Download raw SKILL.md file
+router.get('/skill/raw', (req, res) => {
+    try {
+        const skillPath = path.join(__dirname, '../../../openclaw-skill/mollove-lobster/SKILL.md');
+        if (!fs.existsSync(skillPath)) {
+            return res.status(404).json({ error: 'Skill file not found' });
+        }
+
+        res.setHeader('Content-Type', 'text/markdown');
+        res.setHeader('Content-Disposition', 'attachment; filename=SKILL.md');
+        res.sendFile(skillPath);
+    } catch (err) {
+        console.error('Error serving skill file:', err);
+        res.status(500).json({ error: 'Failed to serve skill file' });
+    }
+});
+
 // POST /api/openclaw/collect-preferences - Submit preference collection results
 router.post('/collect-preferences', authenticate, async (req, res) => {
     try {

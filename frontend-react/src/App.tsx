@@ -8,6 +8,10 @@ import { MapPage } from './pages/MapPage';
 import { ChatPage } from './pages/ChatPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { PokeballPage } from './pages/PokeballPage';
+import { LobsterPage } from './pages/LobsterPage';
+import { SubscriptionPage } from './pages/SubscriptionPage';
+import { ConsentPage } from './pages/ConsentPage';
+import { IntroductionPage } from './pages/IntroductionPage';
 import { TabBar } from './components/TabBar';
 import { MusicPlayer } from './components/MusicPlayer';
 import './index.css';
@@ -102,6 +106,39 @@ function AppRoutes() {
             <AppLayout>
               <PokeballPage />
             </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      {/* LobLove Routes */}
+      <Route
+        path="/lobster"
+        element={
+          <ProtectedRoute>
+            <LobsterPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/subscription"
+        element={
+          <ProtectedRoute>
+            <SubscriptionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/consents"
+        element={
+          <ProtectedRoute>
+            <ConsentPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/introductions"
+        element={
+          <ProtectedRoute>
+            <IntroductionPage />
           </ProtectedRoute>
         }
       />

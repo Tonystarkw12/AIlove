@@ -216,14 +216,39 @@ CREATE INDEX IF NOT EXISTS idx_lobster_prefs_lobster ON lobster_preferences(lobs
 COMMENT ON TABLE lobster_preferences IS 'Deep preference data collected via OpenClaw skill conversations';
 
 -- ============================================
--- 8. Users Table Extensions
+-- 8. Trigger Function (if not exists from schema.sql)
 -- ============================================
-ALTER TABLE users ADD COLUMN IF NOT EXISTS wechat_id VARCHAR(100);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(20) DEFAULT 'none';
-ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_started_at TIMESTAMPTZ;
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 -- ============================================
--- 9. Updated_at Triggers for New Tables
+-- 9. Users Table Extensions (run with superuser)
+-- ============================================
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS wechat_id VARCHAR(100);
+EXCEPTION WHEN insufficient_privilege THEN
+  RAISE NOTICE 'Skipping users table alteration: insufficient privileges. Run manually as superuser.';
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(20) DEFAULT 'none';
+EXCEPTION WHEN insufficient_privilege THEN
+  RAISE NOTICE 'Skipping users table alteration: insufficient privileges. Run manually as superuser.';
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_started_at TIMESTAMPTZ;
+EXCEPTION WHEN insufficient_privilege THEN
+  RAISE NOTICE 'Skipping users table alteration: insufficient privileges. Run manually as superuser.';
+END $$;
+
+-- ============================================
+-- 10. Updated_at Triggers for New Tables
 -- ============================================
 CREATE TRIGGER set_timestamp_lobsters
 BEFORE UPDATE ON lobsters
@@ -255,5 +280,12 @@ BEFORE UPDATE ON lobster_preferences
 FOR EACH ROW
 EXECUTE FUNCTION trigger_set_timestamp();
 
-COMMENT ON COLUMN users.wechat_id IS 'User WeChat ID for introduction exchange (encrypted at rest)';
-COMMENT ON COLUMN users.subscription_status IS 'none, free_trial, active, expired, cancelled';
+DO $$ BEGIN
+  COMMENT ON COLUMN users.wechat_id IS 'User WeChat ID for introduction exchange (encrypted at rest)';
+EXCEPTION WHEN undefined_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  COMMENT ON COLUMN users.subscription_status IS 'none, free_trial, active, expired, cancelled';
+EXCEPTION WHEN undefined_column THEN NULL;
+END $$;
