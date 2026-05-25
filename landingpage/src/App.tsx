@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 function App() {
   const [activeFeature, setActiveFeature] = useState(0)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const features = [
     {
@@ -49,6 +50,29 @@ function App() {
     { label: '用户满意度', value: '98%', icon: '⭐' }
   ]
 
+  const faqs = [
+    {
+      question: 'AIlove 是什么？',
+      answer: 'AIlove 是一个基于深度学习的 AI 智能恋爱匹配平台。通过 AI 分析用户画像、兴趣偏好和行为模式，精准推荐最适合的另一半。'
+    },
+    {
+      question: 'AI 匹配的原理是什么？',
+      answer: '我们使用 Transformer 架构分析用户的兴趣爱好、行为模式和社交偏好，通过协同过滤和内容推荐算法，从数千个特征维度计算匹配度。'
+    },
+    {
+      question: 'AIlove 免费使用吗？',
+      answer: '是的，AIlove 基础功能完全免费。注册后即可享受 AI 智能分析、精准推荐和聊天助手等核心功能。'
+    },
+    {
+      question: '如何保证用户安全？',
+      answer: '我们采用多层 AI 防伪验证和人脸识别技术确保用户真实性，同时使用端到端加密保护用户隐私数据。'
+    },
+    {
+      question: 'AIlove 支持哪些平台？',
+      answer: 'AIlove 支持 Web 端和移动端访问，提供跨平台的无缝体验。'
+    }
+  ]
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -63,7 +87,7 @@ function App() {
         <div className="container mx-auto px-4 py-16 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             {/* Logo */}
-            <div className="text-8xl mb-6 animate-bounce">🎮</div>
+            <div className="text-8xl mb-6 animate-bounce" role="img" aria-label="AIlove logo">🎮</div>
 
             {/* Title */}
             <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white drop-shadow-lg">
@@ -111,10 +135,10 @@ function App() {
       </header>
 
       {/* Features Section */}
-      <section className="py-16 bg-white/80">
+      <section className="py-16 bg-white/80" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-4 text-[#0F380F]">
+            <h2 id="features-heading" className="text-4xl font-bold text-center mb-4 text-[#0F380F]">
               🚀 核心功能
             </h2>
             <p className="text-center text-gray-600 mb-12 text-lg">
@@ -124,20 +148,23 @@ function App() {
             {/* Features Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {features.map((feature, index) => (
-                <div
+                <article
                   key={index}
                   className={`pokemon-card p-6 cursor-pointer transition-all duration-300 hover:scale-105 ${
                     activeFeature === index ? 'ring-4 ring-[#3B4CCA]' : ''
                   }`}
                   onClick={() => setActiveFeature(index)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={feature.title}
                 >
                   <div className={`inline-block px-3 py-1 rounded-full text-white text-sm font-bold mb-4 ${feature.color}`}>
                     功能 #{index + 1}
                   </div>
-                  <div className="text-5xl mb-4">{feature.icon}</div>
+                  <div className="text-5xl mb-4" role="img" aria-hidden="true">{feature.icon}</div>
                   <h3 className="text-xl font-bold mb-3 text-[#0F380F]">{feature.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-                </div>
+                </article>
               ))}
             </div>
           </div>
@@ -145,10 +172,10 @@ function App() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16">
+      <section className="py-16" aria-labelledby="how-it-works-heading">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-4 text-white drop-shadow-lg">
+            <h2 id="how-it-works-heading" className="text-4xl font-bold text-center mb-4 text-white drop-shadow-lg">
               🎮 如何开始
             </h2>
             <p className="text-center text-white/90 mb-12 text-lg">
@@ -158,27 +185,21 @@ function App() {
             <div className="grid md:grid-cols-3 gap-8">
               {/* Step 1 */}
               <div className="pokemon-card p-6 text-center">
-                <div className="w-20 h-20 mx-auto mb-4 bg-[#FF5A5A] rounded-full flex items-center justify-center text-4xl border-4 border-black animate-bounce">
-                  📝
-                </div>
+                <div className="w-20 h-20 mx-auto mb-4 bg-[#FF5A5A] rounded-full flex items-center justify-center text-4xl border-4 border-black animate-bounce" role="img" aria-hidden="true">📝</div>
                 <div className="text-2xl font-bold text-[#0F380F] mb-2">Step 1: 注册账号</div>
                 <p className="text-gray-600">填写基本信息，创建你的专属训练师档案</p>
               </div>
 
               {/* Step 2 */}
               <div className="pokemon-card p-6 text-center">
-                <div className="w-20 h-20 mx-auto mb-4 bg-[#FFCB05] rounded-full flex items-center justify-center text-4xl border-4 border-black animate-bounce" style={{ animationDelay: '0.5s' }}>
-                  🧠
-                </div>
+                <div className="w-20 h-20 mx-auto mb-4 bg-[#FFCB05] rounded-full flex items-center justify-center text-4xl border-4 border-black animate-bounce" style={{ animationDelay: '0.5s' }} role="img" aria-hidden="true">🧠</div>
                 <div className="text-2xl font-bold text-[#0F380F] mb-2">Step 2: AI 分析</div>
                 <p className="text-gray-600">智能系统分析你的偏好，构建精准用户画像</p>
               </div>
 
               {/* Step 3 */}
               <div className="pokemon-card p-6 text-center">
-                <div className="w-20 h-20 mx-auto mb-4 bg-[#3B4CCA] rounded-full flex items-center justify-center text-4xl border-4 border-black animate-bounce" style={{ animationDelay: '1s' }}>
-                  💕
-                </div>
+                <div className="w-20 h-20 mx-auto mb-4 bg-[#3B4CCA] rounded-full flex items-center justify-center text-4xl border-4 border-black animate-bounce" style={{ animationDelay: '1s' }} role="img" aria-hidden="true">💕</div>
                 <div className="text-2xl font-bold text-[#0F380F] mb-2">Step 3: 开始匹配</div>
                 <p className="text-gray-600">接收智能推荐，与心仪对象展开浪漫对话</p>
               </div>
@@ -188,10 +209,10 @@ function App() {
       </section>
 
       {/* Tech Stack Section */}
-      <section className="py-16 bg-white/80">
+      <section className="py-16 bg-white/80" aria-labelledby="tech-heading">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-4 text-[#0F380F]">
+            <h2 id="tech-heading" className="text-4xl font-bold mb-4 text-[#0F380F]">
               🔬 技术实力
             </h2>
             <p className="text-gray-600 mb-12 text-lg">
@@ -200,22 +221,22 @@ function App() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="pokemon-card p-6">
-                <div className="text-4xl mb-3">🤖</div>
+                <div className="text-4xl mb-3" role="img" aria-hidden="true">🤖</div>
                 <h3 className="font-bold text-lg mb-2">深度学习模型</h3>
                 <p className="text-sm text-gray-600">基于 Transformer 的用户行为分析</p>
               </div>
               <div className="pokemon-card p-6">
-                <div className="text-4xl mb-3">⚡</div>
+                <div className="text-4xl mb-3" role="img" aria-hidden="true">⚡</div>
                 <h3 className="font-bold text-lg mb-2">实时推荐引擎</h3>
                 <p className="text-sm text-gray-600">毫秒级响应，即时匹配</p>
               </div>
               <div className="pokemon-card p-6">
-                <div className="text-4xl mb-3">🔒</div>
+                <div className="text-4xl mb-3" role="img" aria-hidden="true">🔒</div>
                 <h3 className="font-bold text-lg mb-2">隐私保护</h3>
                 <p className="text-sm text-gray-600">端到端加密，安全无忧</p>
               </div>
               <div className="pokemon-card p-6">
-                <div className="text-4xl mb-3">📱</div>
+                <div className="text-4xl mb-3" role="img" aria-hidden="true">📱</div>
                 <h3 className="font-bold text-lg mb-2">全平台支持</h3>
                 <p className="text-sm text-gray-600">Web/移动端无缝体验</p>
               </div>
@@ -224,12 +245,46 @@ function App() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-16" aria-labelledby="faq-heading">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <h2 id="faq-heading" className="text-4xl font-bold text-center mb-4 text-[#0F380F]">
+              ❓ 常见问题
+            </h2>
+            <p className="text-center text-gray-600 mb-12 text-lg">
+              关于 AIlove 的常见问题解答
+            </p>
+
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className="pokemon-card p-6">
+                  <button
+                    className="w-full text-left flex justify-between items-center"
+                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                    aria-expanded={openFaq === index}
+                  >
+                    <h3 className="text-lg font-bold text-[#0F380F]">{faq.question}</h3>
+                    <span className="text-2xl text-[#3B4CCA] transition-transform duration-300" style={{ transform: openFaq === index ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                      +
+                    </span>
+                  </button>
+                  {openFaq === index && (
+                    <p className="mt-4 text-gray-600 leading-relaxed">{faq.answer}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
-      <section className="py-20">
+      <section className="py-20" aria-labelledby="cta-heading">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="pokemon-card p-12 bg-gradient-to-br from-[#FFCB05] to-[#FF5A5A]">
-              <h2 className="text-4xl font-bold mb-4 text-white drop-shadow-lg">
+              <h2 id="cta-heading" className="text-4xl font-bold mb-4 text-white drop-shadow-lg">
                 准备好了吗？
               </h2>
               <p className="text-xl text-white mb-8">
@@ -250,7 +305,7 @@ function App() {
       {/* Footer */}
       <footer className="bg-[#0F380F] text-white py-8">
         <div className="container mx-auto px-4 text-center">
-          <div className="text-2xl mb-2">🎮</div>
+          <div className="text-2xl mb-2" role="img" aria-hidden="true">🎮</div>
           <p className="text-white/70 text-sm">
             © 2026 AIlove. All rights reserved.
           </p>

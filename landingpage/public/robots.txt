@@ -1,0 +1,24 @@
+# AIlove - AI 智能恋爱匹配平台
+# https://ailove.201014.xyz/
+
+User-agent: *
+Allow: /
+
+# AI Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Sitemap
+Sitemap: https://ailove.201014.xyz/sitemap.xml
