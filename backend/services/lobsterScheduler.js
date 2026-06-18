@@ -21,23 +21,29 @@ class LobsterScheduler {
             }
         });
 
-        // Chat evaluation - every 5 minutes
+        // Chat archival - every 5 minutes (archive stale chats with no WebSocket activity)
+        // No more LLM evaluation — agents handle chat lifecycle via WebSocket
         cron.schedule('*/5 * * * *', async () => {
             try {
-                const pendingChats = await pool.query(`
+                // Archive chats that have been active for >1 hour with no new messages
+                // (agents should end chats themselves, but this catches stale ones)
+                const staleChats = await pool.query(`
                     SELECT chat_id FROM lobster_chats
                     WHERE session_status = 'active'
-                    AND messages != '[]'
-                    AND compatibility_score IS NULL
-                    AND created_at < NOW() - INTERVAL '5 minutes'
+                    AND updated_at < NOW() - INTERVAL '1 hour'
                     LIMIT 10
                 `);
 
-                for (const chat of pendingChats.rows) {
-                    await lobsterOrchestrator.evaluateChat(chat.chat_id);
+                for (const chat of staleChats.rows) {
+                    await pool.query(`
+                        UPDATE lobster_chats
+                        SET session_status = 'completed', updated_at = NOW()
+                        WHERE chat_id = $1
+                    `, [chat.chat_id]);
+                    console.log(`[Scheduler] Archived stale chat ${chat.chat_id}`);
                 }
             } catch (err) {
-                console.error('[Scheduler] Chat evaluation failed:', err);
+                console.error('[Scheduler] Chat archival failed:', err);
             }
         });
 

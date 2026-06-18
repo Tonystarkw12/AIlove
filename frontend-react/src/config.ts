@@ -4,14 +4,15 @@ const isProduction = typeof window !== 'undefined' && window.location.hostname !
 // In production (loveai.201014.xyz), use relative URLs so nginx can proxy to backend
 const apiBase = isProduction ? '/api' : 'http://192.168.0.14:3052/api';
 const uploadBase = isProduction ? '/uploads' : 'http://192.168.0.14:3052/uploads';
-const wsBase = isProduction ? (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/ws/chat' : 'ws://192.168.0.14:3052/ws/chat';
+const wsBase = isProduction ? (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host : 'ws://192.168.0.14:3052';
 const musicBase = isProduction ? '/music' : 'http://192.168.0.14:3052/music';
 const picturesBase = isProduction ? '/pictures' : 'http://192.168.0.14:3052/pictures';
 
 // Allow override via Vite env vars
 export const API_BASE_URL = import.meta.env.VITE_API_URL || apiBase;
 export const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_URL || uploadBase;
-export const WS_URL = import.meta.env.VITE_WS_URL || wsBase;
+export const WS_URL = import.meta.env.VITE_WS_URL || wsBase + '/ws/chat';
+export const WS_OWNER_URL = (import.meta.env.VITE_WS_URL || wsBase) + '/ws/owner';
 export const MUSIC_BASE_URL = import.meta.env.VITE_MUSIC_URL || musicBase;
 export const PICTURES_BASE_URL = import.meta.env.VITE_PICTURES_URL || picturesBase;
 

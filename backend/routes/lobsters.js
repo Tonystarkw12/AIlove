@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const pool = require('../db');
 const lobsterOrchestrator = require('../services/lobsterOrchestrator');
 const subscriptionService = require('../services/subscriptionService');
-const conversationService = require('../services/lobsterConversationService');
 
 // Middleware to verify authentication
 const authenticate = (req, res, next) => {
@@ -36,15 +36,25 @@ router.post('/initialize', authenticate, async (req, res) => {
         // Check if lobster already exists
         const existing = await pool.query(`SELECT * FROM lobsters WHERE owner_id = $1`, [req.userId]);
         if (existing.rows.length > 0) {
-            return res.json({ lobster: existing.rows[0], created: false });
+            const lobster = existing.rows[0];
+            // Generate token if missing (backward compat)
+            if (!lobster.lobster_token) {
+                const token = crypto.randomBytes(32).toString('hex');
+                await pool.query(`UPDATE lobsters SET lobster_token = $1 WHERE lobster_id = $2`, [token, lobster.lobster_id]);
+                lobster.lobster_token = token;
+            }
+            return res.json({ lobster, created: false });
         }
+
+        // Generate secure token for WebSocket authentication
+        const lobsterToken = crypto.randomBytes(32).toString('hex');
 
         // Create lobster with default personality and avatar based on style (ISC-14)
         const lobster = await pool.query(`
-            INSERT INTO lobsters (owner_id, name, conversation_style, avatar_url)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO lobsters (owner_id, name, conversation_style, avatar_url, lobster_token)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *
-        `, [req.userId, `龙虾${Math.floor(Math.random() * 9000 + 1000)}`, 'friendly', 'friendly']);
+        `, [req.userId, `龙虾${Math.floor(Math.random() * 9000 + 1000)}`, 'friendly', 'friendly', lobsterToken]);
 
         // Create empty preferences
         await pool.query(`
@@ -277,81 +287,6 @@ router.post('/me/match-now', authenticate, requireSubscription, async (req, res)
     } catch (err) {
         console.error('Error triggering match:', err);
         res.status(500).json({ error: 'Failed to trigger matching' });
-    }
-});
-
-// POST /api/lobsters/chats/:chatId/converse - Run LLM-powered conversation turns
-router.post('/chats/:chatId/converse', authenticate, requireSubscription, async (req, res) => {
-    try {
-        const { turns = 4 } = req.body;
-
-        // Verify user owns one of the lobsters in this chat
-        const chat = await pool.query(`
-            SELECT lc.*, la.owner_id as owner_a_id, lb.owner_id as owner_b_id,
-                   la.name as lobster_a_name, la.conversation_style as style_a,
-                   lb.name as lobster_b_name, lb.conversation_style as style_b
-            FROM lobster_chats lc
-            JOIN lobsters la ON lc.lobster_a_id = la.lobster_id
-            JOIN lobsters lb ON lc.lobster_b_id = lb.lobster_id
-            WHERE lc.chat_id = $1 AND lc.session_status = 'active'
-        `, [req.params.chatId]);
-
-        if (chat.rows.length === 0) {
-            return res.status(404).json({ error: 'Active chat not found' });
-        }
-
-        const c = chat.rows[0];
-        const isOwnerA = c.owner_a_id === req.userId;
-        const isOwnerB = c.owner_b_id === req.userId;
-        if (!isOwnerA && !isOwnerB) {
-            return res.status(403).json({ error: 'Access denied' });
-        }
-
-        // Get preferences for both lobsters
-        const prefsA = await pool.query(`SELECT * FROM lobster_preferences WHERE lobster_id = $1`, [c.lobster_a_id]);
-        const prefsB = await pool.query(`SELECT * FROM lobster_preferences WHERE lobster_id = $1`, [c.lobster_b_id]);
-
-        const messages = c.messages || [];
-        const maxTurns = turns;
-
-        // Generate multi-turn conversation
-        for (let turn = 0; turn < maxTurns; turn++) {
-            // Alternate: even turns = lobster A speaks, odd = lobster B
-            const speaker = turn % 2 === 0 ? 'a' : 'b';
-            const speakerLobster = speaker === 'a' ? { lobster_id: c.lobster_a_id, name: c.lobster_a_name, conversation_style: c.style_a } : { lobster_id: c.lobster_b_id, name: c.lobster_b_name, conversation_style: c.style_b };
-            const listenerLobster = speaker === 'a' ? { lobster_id: c.lobster_b_id, name: c.lobster_b_name } : { lobster_id: c.lobster_a_id, name: c.lobster_a_name };
-            const speakerPrefs = speaker === 'a' ? (prefsA.rows[0] || null) : (prefsB.rows[0] || null);
-            const listenerPrefs = speaker === 'a' ? (prefsB.rows[0] || null) : (prefsA.rows[0] || null);
-
-            const msg = await conversationService.generateAgentMessage({
-                speaker: speakerLobster,
-                listener: listenerLobster,
-                speakerPrefs,
-                listenerPrefs,
-                conversationHistory: messages.slice(-6),
-                turn,
-                maxTurns
-            });
-
-            messages.push(msg);
-        }
-
-        // Save updated messages
-        await pool.query(`
-            UPDATE lobster_chats SET messages = $1, updated_at = NOW()
-            WHERE chat_id = $2
-        `, [JSON.stringify(messages), c.chat_id]);
-
-        // If all turns completed, evaluate the conversation
-        if (messages.length >= maxTurns) {
-            const evalResult = await lobsterOrchestrator.evaluateChat(c.chat_id);
-            res.json({ messages: messages.slice(-maxTurns), evaluation: evalResult });
-        } else {
-            res.json({ messages: messages.slice(-maxTurns), conversationContinuing: true });
-        }
-    } catch (err) {
-        console.error('Error in conversation:', err);
-        res.status(500).json({ error: 'Conversation failed' });
     }
 });
 

@@ -18,6 +18,7 @@ interface Lobster {
   matching_criteria: any;
   dealbreakers: string[];
   conversation_style: string;
+  lobster_token: string | null;
   created_at: string;
   owner_nickname: string;
 }
@@ -45,6 +46,8 @@ export function LobsterPage() {
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
   const [trialCountdown, setTrialCountdown] = useState('');
+  const [showToken, setShowToken] = useState(false);
+  const [tokenCopied, setTokenCopied] = useState(false);
 
   useEffect(() => {
     fetchLobsterData();
@@ -128,6 +131,25 @@ export function LobsterPage() {
       if (err.response?.status === 402) {
         alert('订阅已过期，请升级后继续匹配');
       }
+    }
+  };
+
+  const copyToken = async () => {
+    if (!lobster?.lobster_token) return;
+    try {
+      await navigator.clipboard.writeText(lobster.lobster_token);
+      setTokenCopied(true);
+      setTimeout(() => setTokenCopied(false), 2000);
+    } catch {
+      // Fallback for non-HTTPS
+      const textarea = document.createElement('textarea');
+      textarea.value = lobster.lobster_token;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setTokenCopied(true);
+      setTimeout(() => setTokenCopied(false), 2000);
     }
   };
 
@@ -307,6 +329,37 @@ export function LobsterPage() {
             </button>
           </div>
         </div>
+
+        {/* Lobster Token (for OpenClaw WebSocket auth) */}
+        {lobster?.lobster_token && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20">
+            <h2 className="text-lg font-bold text-white mb-2">🔑 龙虾密钥</h2>
+            <p className="text-[#87CEEB] text-xs mb-3">
+              将此密钥配置到 OpenClaw 的 lobster 技能中，你的龙虾就能通过 WebSocket 自动与其他龙虾对话。
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-[#1a3a5c] rounded-xl p-3 font-mono text-sm text-[#B0E0E6] overflow-hidden">
+                {showToken ? (
+                  <span className="break-all">{lobster.lobster_token}</span>
+                ) : (
+                  <span>{'•'.repeat(32)}</span>
+                )}
+              </div>
+              <button
+                onClick={() => setShowToken(!showToken)}
+                className="bg-[#306230] hover:bg-[#3d7a3d] text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors shrink-0"
+              >
+                {showToken ? '🙈' : '👁️'}
+              </button>
+              <button
+                onClick={copyToken}
+                className="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors shrink-0"
+              >
+                {tokenCopied ? '✓' : '📋'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Conversation Style */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20">

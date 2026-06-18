@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { API_BASE_URL } from '../config';
+import { API_BASE_URL, WS_OWNER_URL } from '../config';
 const API_BASE = API_BASE_URL;
 
 interface ChatMessage {
@@ -31,10 +31,82 @@ export function LobsterChatPage() {
   const [chats, setChats] = useState<LobsterChat[]>([]);
   const [selectedChat, setSelectedChat] = useState<LobsterChat | null>(null);
   const [loading, setLoading] = useState(true);
+  const [wsStatus, setWsStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+  const [chatStatus, setChatStatus] = useState<string>('');
+  const wsRef = useRef<WebSocket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchChats();
   }, []);
+
+  // WebSocket connection for real-time updates
+  useEffect(() => {
+    if (!token) return;
+
+    const wsUrl = `${WS_OWNER_URL}?token=${token}`;
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      setWsStatus('connected');
+      // Subscribe to selected chat if any
+      if (selectedChat) {
+        ws.send(JSON.stringify({ type: 'subscribe_chat', chat_id: selectedChat.chat_id }));
+      }
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        handleWsMessage(msg);
+      } catch {
+        // Ignore non-JSON messages
+      }
+    };
+
+    ws.onclose = () => {
+      setWsStatus('disconnected');
+    };
+
+    ws.onerror = () => {
+      setWsStatus('disconnected');
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [token, selectedChat?.chat_id]);
+
+  // Auto-scroll on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [selectedChat?.messages]);
+
+  const handleWsMessage = useCallback((msg: any) => {
+    if (msg.type === 'lobster:message' && msg.chat_id === selectedChat?.chat_id) {
+      setSelectedChat(prev => {
+        if (!prev) return prev;
+        const newMessage: ChatMessage = {
+          sender: msg.sender,
+          content: msg.content,
+          timestamp: msg.timestamp
+        };
+        return { ...prev, messages: [...prev.messages, newMessage] };
+      });
+    } else if (msg.type === 'lobster:chat_started' && !selectedChat) {
+      // Refresh chat list when a new chat starts
+      fetchChats();
+    } else if (msg.type === 'lobster:chat_ended' && msg.chat_id === selectedChat?.chat_id) {
+      setChatStatus('ended');
+      setSelectedChat(prev => prev ? { ...prev, session_status: 'completed' } : prev);
+      fetchChats();
+    } else if (msg.type === 'authenticated' || msg.type === 'subscribed') {
+      // Expected messages, no action needed
+    } else if (msg.type === 'active_chats') {
+      // Could highlight active chats
+    }
+  }, [selectedChat?.chat_id]);
 
   const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
 
@@ -53,6 +125,12 @@ export function LobsterChatPage() {
     try {
       const res = await axios.get(`${API_BASE}/lobsters/me/chats/${chatId}`, authHeaders);
       setSelectedChat(res.data.chat);
+      setChatStatus(res.data.chat.session_status === 'active' ? 'active' : 'ended');
+
+      // Subscribe to this chat via WebSocket
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: 'subscribe_chat', chat_id: chatId }));
+      }
     } catch (err) {
       console.error('Failed to open chat:', err);
     }
@@ -67,21 +145,43 @@ export function LobsterChatPage() {
   }
 
   if (selectedChat) {
+    const isActive = selectedChat.session_status === 'active' || chatStatus === 'active';
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
         <div className="max-w-md mx-auto pt-4">
           <button
-            onClick={() => setSelectedChat(null)}
+            onClick={() => { setSelectedChat(null); setChatStatus(''); }}
             className="text-[#87CEEB] mb-4 flex items-center"
           >
             ← 返回对话列表
           </button>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20">
-            <h2 className="text-lg font-bold text-white">
-              🦞 {selectedChat.other_lobster_name || '未知龙虾'}
-            </h2>
-            <p className="text-[#87CEEB] text-sm">与 {selectedChat.other_owner_name} 的龙虾</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-white">
+                  🦞 {selectedChat.other_lobster_name || '未知龙虾'}
+                </h2>
+                <p className="text-[#87CEEB] text-sm">与 {selectedChat.other_owner_name} 的龙虾</p>
+              </div>
+              <div className="text-right">
+                {isActive ? (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#4ECDC4]/20 text-[#4ECDC4] text-sm font-bold">
+                    <span className="w-2 h-2 bg-[#4ECDC4] rounded-full mr-2 animate-pulse"></span>
+                    正在对话...
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-500/20 text-gray-400 text-sm font-bold">
+                    对话已结束
+                  </span>
+                )}
+                <div className="mt-1">
+                  <span className={`text-xs ${wsStatus === 'connected' ? 'text-[#4ECDC4]' : 'text-gray-500'}`}>
+                    {wsStatus === 'connected' ? '● 实时连接' : wsStatus === 'connecting' ? '○ 连接中...' : '○ 未连接'}
+                  </span>
+                </div>
+              </div>
+            </div>
             {selectedChat.compatibility_score && (
               <div className="mt-2 flex items-center">
                 <span className="text-[#4ECDC4] font-bold">匹配度: {selectedChat.compatibility_score}%</span>
@@ -90,7 +190,7 @@ export function LobsterChatPage() {
           </div>
 
           {/* Compatibility Analysis */}
-          {selectedChat.compatibility_analysis && (
+          {selectedChat.compatibility_analysis && selectedChat.session_status === 'completed' && (
             <div className="bg-[#4ECDC4]/10 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-[#4ECDC4]/30">
               <h3 className="text-white font-bold mb-2">📊 匹配分析</h3>
               <p className="text-[#B0E0E6] text-sm">{selectedChat.compatibility_analysis}</p>
@@ -115,18 +215,21 @@ export function LobsterChatPage() {
                   >
                     <p className="text-[#B0E0E6] text-sm">{msg.content}</p>
                     <p className="text-[#87CEEB] text-xs mt-1">
-                      {new Date(msg.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                      {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : ''}
                     </p>
                   </div>
                 ))
               ) : (
-                <p className="text-[#87CEEB] text-center py-8">对话加载中...</p>
+                <p className="text-[#87CEEB] text-center py-8">
+                  {isActive ? '等待龙虾开始对话...' : '暂无对话记录'}
+                </p>
               )}
+              <div ref={messagesEndRef} />
             </div>
           </div>
 
           {/* Action Buttons */}
-          {selectedChat.outcome === 'recommended' && !selectedChat.owner_a_response && (
+          {selectedChat.outcome === 'recommended' && !selectedChat.owner_a_response && selectedChat.session_status === 'completed' && (
             <div className="mt-4 flex gap-3">
               <button
                 onClick={async () => {
@@ -176,6 +279,9 @@ export function LobsterChatPage() {
         <div className="text-center mb-6">
           <div className="text-5xl mb-2">💬</div>
           <h1 className="text-2xl font-bold text-white">龙虾对话</h1>
+          <p className={`text-sm mt-2 ${wsStatus === 'connected' ? 'text-[#4ECDC4]' : 'text-gray-500'}`}>
+            {wsStatus === 'connected' ? '● 实时连接已建立' : wsStatus === 'connecting' ? '○ 正在连接...' : '○ 未连接'}
+          </p>
         </div>
 
         {chats.length === 0 ? (
@@ -203,7 +309,7 @@ export function LobsterChatPage() {
                     <div>
                       <h4 className="text-white font-bold">{chat.other_owner_name}</h4>
                       <p className="text-[#87CEEB] text-xs">
-                        {chat.session_status === 'active' ? '对话中...' :
+                        {chat.session_status === 'active' ? '正在对话...' :
                          chat.outcome === 'recommended' ? '推荐认识' : '已结束'}
                       </p>
                     </div>

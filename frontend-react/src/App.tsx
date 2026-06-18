@@ -4,16 +4,11 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { HomePage } from './pages/HomePage';
 import { ProfilePage } from './pages/ProfilePage';
-import { MapPage } from './pages/MapPage';
-import { ChatPage } from './pages/ChatPage';
-import { CommunityPage } from './pages/CommunityPage';
-import { PokeballPage } from './pages/PokeballPage';
 import { LobsterPage } from './pages/LobsterPage';
 import { LobsterChatPage } from './pages/LobsterChatPage';
 import { LobsterSkillPage } from './pages/LobsterSkillPage';
 import { SubscriptionPage } from './pages/SubscriptionPage';
 import { ConsentPage } from './pages/ConsentPage';
-import { IntroductionPage } from './pages/IntroductionPage';
 import { TabBar } from './components/TabBar';
 import { MusicPlayer } from './components/MusicPlayer';
 import './index.css';
@@ -62,51 +57,11 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/map"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <MapPage />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/chat"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <ChatPage />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/community"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <CommunityPage />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/profile"
         element={
           <ProtectedRoute>
             <AppLayout>
               <ProfilePage />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/pokeball"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <PokeballPage />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -141,14 +96,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ConsentPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/introductions"
-        element={
-          <ProtectedRoute>
-            <IntroductionPage />
           </ProtectedRoute>
         }
       />
