@@ -66,7 +66,7 @@ router.get('/skill/download', (req, res) => {
     }
 });
 
-// PUBLIC: GET /api/openclaw/skill/raw - Download raw SKILL.md file
+// PUBLIC: GET /api/openclaw/skill/raw - Download raw SKILL.md file (template, no user data)
 router.get('/skill/raw', (req, res) => {
     try {
         const skillPath = path.join(__dirname, '../../openclaw-skill/mollove-lobster/SKILL.md');
@@ -79,6 +79,57 @@ router.get('/skill/raw', (req, res) => {
         res.sendFile(skillPath);
     } catch (err) {
         console.error('Error serving skill file:', err);
+        res.status(500).json({ error: 'Failed to serve skill file' });
+    }
+});
+
+// PUBLIC: GET /api/openclaw/skill/install?lobster_token=xxx
+// One-line install flow. User copies this URL to their OpenClaw.
+// Returns SKILL.md with the lobster's config baked in.
+// The lobster_token in URL acts as auth — only the owner has it.
+router.get('/skill/install', async (req, res) => {
+    const lobsterToken = req.query.lobster_token;
+
+    if (!lobsterToken) {
+        return res.status(400).json({
+            error: '缺少 lobster_token 参数。请从平台龙虾页面复制完整安装链接。'
+        });
+    }
+
+    try {
+        const lobsterRes = await pool.query(
+            `SELECT lobster_id, name, lobster_token FROM lobsters WHERE lobster_token = $1`,
+            [lobsterToken]
+        );
+
+        if (lobsterRes.rows.length === 0) {
+            return res.status(404).json({ error: '无效的龙虾 token。请重新从平台复制安装链接。' });
+        }
+
+        const lobster = lobsterRes.rows[0];
+
+        const skillPath = path.join(__dirname, '../../openclaw-skill/mollove-lobster/SKILL.md');
+        if (!fs.existsSync(skillPath)) {
+            return res.status(404).json({ error: 'Skill template not found' });
+        }
+
+        let content = fs.readFileSync(skillPath, 'utf-8');
+
+        // Bake user-specific config into the skill file
+        const backendUrl = process.env.BACKEND_URL || 'http://localhost:3052';
+        const wsUrl = backendUrl.replace(/^http/, 'ws') + '/ws/lobster';
+
+        content = content
+            .replace(/\{\{LOBSTER_TOKEN\}\}/g, lobster.lobster_token)
+            .replace(/\{\{LOBSTER_NAME\}\}/g, lobster.name)
+            .replace(/\{\{PLATFORM_URL\}\}/g, backendUrl)
+            .replace(/\{\{WS_URL\}\}/g, wsUrl);
+
+        res.setHeader('Content-Type', 'text/markdown');
+        res.setHeader('Content-Disposition', 'attachment; filename=SKILL.md');
+        res.send(content);
+    } catch (err) {
+        console.error('Error serving install skill:', err);
         res.status(500).json({ error: 'Failed to serve skill file' });
     }
 });

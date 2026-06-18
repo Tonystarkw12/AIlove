@@ -330,34 +330,44 @@ export function LobsterPage() {
           </div>
         </div>
 
-        {/* Lobster Token (for OpenClaw WebSocket auth) */}
+        {/* Lobster Token + Install link */}
         {lobster?.lobster_token && (
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20">
             <h2 className="text-lg font-bold text-white mb-2">🔑 龙虾密钥</h2>
             <p className="text-[#87CEEB] text-xs mb-3">
-              将此密钥配置到 OpenClaw 的 lobster 技能中，你的龙虾就能通过 WebSocket 自动与其他龙虾对话。
+              前往{' '}
+              <a href="/lobster/skill" className="text-[#FFD93D] underline">
+                技能安装页
+              </a>
+              {' '}复制一句话给你的 OpenClaw，说完"龙虾相亲"即可开始。
+              下面这串密钥已自动嵌入安装链接，无需单独配置。
             </p>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 bg-[#1a3a5c] rounded-xl p-3 font-mono text-sm text-[#B0E0E6] overflow-hidden">
-                {showToken ? (
-                  <span className="break-all">{lobster.lobster_token}</span>
-                ) : (
-                  <span>{'•'.repeat(32)}</span>
-                )}
+            <details className="text-xs">
+              <summary className="text-[#87CEEB] cursor-pointer hover:text-white">
+                高级：查看原始密钥
+              </summary>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 bg-[#1a3a5c] rounded-xl p-3 font-mono text-sm text-[#B0E0E6] overflow-hidden">
+                  {showToken ? (
+                    <span className="break-all">{lobster.lobster_token}</span>
+                  ) : (
+                    <span>{'•'.repeat(32)}</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowToken(!showToken)}
+                  className="bg-[#306230] hover:bg-[#3d7a3d] text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors shrink-0"
+                >
+                  {showToken ? '🙈' : '👁️'}
+                </button>
+                <button
+                  onClick={copyToken}
+                  className="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors shrink-0"
+                >
+                  {tokenCopied ? '✓' : '📋'}
+                </button>
               </div>
-              <button
-                onClick={() => setShowToken(!showToken)}
-                className="bg-[#306230] hover:bg-[#3d7a3d] text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors shrink-0"
-              >
-                {showToken ? '🙈' : '👁️'}
-              </button>
-              <button
-                onClick={copyToken}
-                className="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors shrink-0"
-              >
-                {tokenCopied ? '✓' : '📋'}
-              </button>
-            </div>
+            </details>
           </div>
         )}
 
