@@ -30,7 +30,7 @@ class LobsterOrchestrator {
      */
     async discoverCandidates(lobsterId, limit = 20) {
         const lobster = await pool.query(`
-            SELECT l.owner_id FROM lobsters WHERE lobster_id = $1
+            SELECT l.owner_id FROM lobsters l WHERE l.lobster_id = $1
         `, [lobsterId]);
 
         if (lobster.rows.length === 0) return [];
