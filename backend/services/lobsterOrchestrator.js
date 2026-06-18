@@ -1,5 +1,4 @@
 const pool = require('../db');
-const { calculateMatchScore } = require('./matchingAlgorithm');
 const crypto = require('./crypto');
 
 /**
@@ -29,43 +28,6 @@ class LobsterOrchestrator {
         `, [lobsterAId, lobsterBId]);
 
         return result.rows[0].chat_id;
-    }
-
-    /**
-     * Finalize a completed chat — compute score via matching algorithm (no LLM).
-     * Called when agents end a chat or scheduler detects stale active chat.
-     */
-    async evaluateChat(chatId) {
-        const chat = await pool.query(`
-            SELECT * FROM lobster_chats WHERE chat_id = $1
-        `, [chatId]);
-
-        if (chat.rows.length === 0) return null;
-
-        const c = chat.rows[0];
-
-        // Compute score from matching algorithm (no LLM)
-        const ownerA = await pool.query(`SELECT owner_id FROM lobsters WHERE lobster_id = $1`, [c.lobster_a_id]);
-        const ownerB = await pool.query(`SELECT owner_id FROM lobsters WHERE lobster_id = $1`, [c.lobster_b_id]);
-
-        if (ownerA.rows.length === 0 || ownerB.rows.length === 0) return null;
-
-        const score = await calculateMatchScore(ownerA.rows[0].owner_id, ownerB.rows[0].owner_id);
-
-        await pool.query(`
-            UPDATE lobster_chats
-            SET compatibility_score = $1,
-                session_status = 'completed',
-                outcome = CASE WHEN $1 >= 70 THEN 'recommended' ELSE 'rejected' END
-            WHERE chat_id = $2
-        `, [score, chatId]);
-
-        // If score is high enough, recommend to owner (ISC-29: threshold >70)
-        if (score >= 70) {
-            await this.recommendToOwner(chatId);
-        }
-
-        return { chatId, score, outcome: score >= 70 ? 'recommended' : 'rejected' };
     }
 
     /**

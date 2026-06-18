@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../db'); // Import pool from db.js
 const { v4: uuidv4 } = require('uuid'); // For generating user_id if not handled by DB default
-const { updateRecommendationsForUser } = require('../services/recommendationService');
 
 const router = express.Router();
 
@@ -61,12 +60,6 @@ router.post('/register', async (req, res) => {
             userId: newUser.user_id,
             token: token,
             message: "User registered successfully"
-        });
-
-        // Trigger recommendation update asynchronously
-        updateRecommendationsForUser(newUser.user_id).catch(err => {
-            console.error(`Failed to trigger recommendation update for new user ${newUser.user_id}:`, err);
-            // Decide if this failure should be communicated or just logged
         });
 
     } catch (error) {

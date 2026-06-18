@@ -5,8 +5,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { updateRecommendationsForUser } = require('../services/recommendationService');
-const { assignPokemonAvatar } = require('../services/pokemonMapper');
 
 const router = express.Router();
 
@@ -177,22 +175,6 @@ router.put('/me/profile', authenticateToken, async (req, res) => {
             message: "Profile updated successfully",
             updatedProfile: updatedProfile
         });
-
-        // Trigger recommendation update asynchronously
-        // Only trigger if relevant fields for recommendation were updated
-        const relevantFieldsForReco = [
-            'gender', 'birth_date', 'occupation', 'salary_range', 'orientation', 'bio',
-            'location_geohash', 'location_latitude', 'location_longitude',
-            'preferred_age_min', 'preferred_age_max', 'preferred_gender',
-            'tags', 'values_description', 'q_and_a'
-        ];
-        const wasRelevantFieldUpdated = relevantFieldsForReco.some(field => req.body.hasOwnProperty(field));
-
-        if (wasRelevantFieldUpdated) {
-            updateRecommendationsForUser(userId).catch(err => {
-                console.error(`Failed to trigger recommendation update for user ${userId} after profile update:`, err);
-            });
-        }
 
     } catch (error) {
         console.error("Update profile error:", error);
@@ -655,69 +637,6 @@ router.post('/me/match', authenticateToken, async (req, res) => {
             error: {
                 code: 'INTERNAL_SERVER_ERROR',
                 message: '匹配操作失败'
-            }
-        });
-    }
-});
-
-// POST /api/users/me/assign-pokemon - 分配宝可梦头像
-router.post('/me/assign-pokemon', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.userId;
-
-        // 获取用户的性格标签
-        const userResult = await pool.query(
-            `SELECT tags, pokemon_avatar_id FROM users WHERE user_id = $1`,
-            [userId]
-        );
-
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({
-                error: {
-                    code: 'NOT_FOUND',
-                    message: '用户不存在'
-                }
-            });
-        }
-
-        const user = userResult.rows[0];
-        const tags = user.tags || [];
-
-        // 如果已经有宝可梦头像，直接返回
-        if (user.pokemon_avatar_id) {
-            return res.status(200).json({
-                message: '已有宝可梦头像',
-                pokemonAvatarId: user.pokemon_avatar_id,
-                avatarUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${user.pokemon_avatar_id}.png`
-            });
-        }
-
-        // 使用性格标签分配宝可梦
-        const pokemonData = assignPokemonAvatar(tags);
-
-        // 更新用户的宝可梦头像ID
-        await pool.query(
-            `UPDATE users SET pokemon_avatar_id = $1 WHERE user_id = $2`,
-            [pokemonData.avatarId, userId]
-        );
-
-        res.status(200).json({
-            message: '宝可梦头像分配成功',
-            pokemon: {
-                id: pokemonData.avatarId,
-                name: pokemonData.pokemonName,
-                type: pokemonData.pokemonType,
-                avatarUrl: pokemonData.avatarUrl,
-                matchedTag: pokemonData.matchedTag
-            }
-        });
-
-    } catch (error) {
-        console.error('Assign Pokemon avatar error:', error);
-        res.status(500).json({
-            error: {
-                code: 'INTERNAL_SERVER_ERROR',
-                message: '分配宝可梦头像失败'
             }
         });
     }
