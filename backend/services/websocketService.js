@@ -14,6 +14,13 @@ const lobsterClients = new Map();
 // Active chat rooms: { chatId: { lobsterA: lobsterId, lobsterB: lobsterId, ownerA: userId, ownerB: userId, status } }
 const chatRooms = new Map();
 
+// Lobby: Map<lobsterId, { lobster, publicProfile }>
+// publicProfile = { id, name, conversation_style, summary }
+const lobby = new Map();
+
+// Pending chat requests: { requestId: { from, target, intro } }
+const pendingRequests = new Map();
+
 /**
  * Initialize the WebSocket server with two connection paths:
  * - /ws/lobster?token=<lobster_token> — OpenClaw agent connections
@@ -66,6 +73,126 @@ function initializeWebSocketServer(httpServer) {
 }
 
 /**
+ * Build a human-readable Chinese summary from lobster preferences + lobster row.
+ * Example: "主人寻找长期关系，喜欢徒步/科幻/音乐，在北京海淀，理想对象温柔有主见，不接受抽烟。"
+ */
+async function buildPublicProfile(lobsterId) {
+    // Fetch lobster base info + owner location
+    const lobsterRes = await pool.query(`
+        SELECT l.lobster_id, l.name, l.conversation_style, l.owner_id,
+               u.location
+        FROM lobsters l
+        JOIN users u ON l.owner_id = u.user_id
+        WHERE l.lobster_id = $1
+    `, [lobsterId]);
+
+    if (lobsterRes.rows.length === 0) return null;
+    const l = lobsterRes.rows[0];
+
+    // Fetch preferences
+    const prefsRes = await pool.query(`
+        SELECT owner_dating_goals, owner_values, owner_lifestyle,
+               owner_ideal_partner, dealbreaker_list
+        FROM lobster_preferences
+        WHERE lobster_id = $1
+    `, [lobsterId]);
+
+    const prefs = prefsRes.rows[0] || {};
+
+    // Build summary parts
+    const parts = [];
+
+    // Dating goals
+    if (prefs.owner_dating_goals) {
+        parts.push(`主人寻找${prefs.owner_dating_goals}`);
+    }
+
+    // Lifestyle / interests
+    if (prefs.owner_lifestyle) {
+        const lifestyle = prefs.owner_lifestyle;
+        let lifestyleStr = '';
+        if (typeof lifestyle === 'object') {
+            // Extract interests/hobbies from JSONB
+            const interests = lifestyle.interests || lifestyle.hobbies || lifestyle.weekend || [];
+            if (Array.isArray(interests) && interests.length > 0) {
+                lifestyleStr = interests.slice(0, 4).join('/');
+            } else if (typeof lifestyle === 'string') {
+                lifestyleStr = lifestyle;
+            } else {
+                // Flatten object values
+                const vals = Object.values(lifestyle).filter(v => typeof v === 'string' && v.length > 0);
+                lifestyleStr = vals.slice(0, 3).join('/');
+            }
+        } else if (typeof lifestyle === 'string') {
+            lifestyleStr = lifestyle;
+        }
+        if (lifestyleStr) {
+            parts.push(`喜欢${lifestyleStr}`);
+        }
+    }
+
+    // Location
+    if (l.location) {
+        parts.push(`在${l.location}`);
+    }
+
+    // Ideal partner
+    if (prefs.owner_ideal_partner) {
+        const ideal = prefs.owner_ideal_partner;
+        let idealStr = '';
+        if (typeof ideal === 'object') {
+            const traits = ideal.traits || ideal.qualities || [];
+            if (Array.isArray(traits) && traits.length > 0) {
+                idealStr = traits.slice(0, 3).join('、');
+            } else {
+                const vals = Object.values(ideal).filter(v => typeof v === 'string' && v.length > 0);
+                idealStr = vals.slice(0, 2).join('、');
+            }
+        } else if (typeof ideal === 'string') {
+            idealStr = ideal;
+        }
+        if (idealStr) {
+            parts.push(`理想对象${idealStr}`);
+        }
+    }
+
+    // Dealbreakers
+    if (prefs.dealbreaker_list && prefs.dealbreaker_list.length > 0) {
+        parts.push(`不接受${prefs.dealbreaker_list.slice(0, 3).join('/')}`);
+    }
+
+    const summary = parts.length > 0
+        ? parts.join('，') + '。'
+        : '主人暂未填写详细偏好。';
+
+    return {
+        id: l.lobster_id,
+        name: l.name,
+        conversation_style: l.conversation_style,
+        owner_id: l.owner_id,
+        summary
+    };
+}
+
+/**
+ * Broadcast lobby_update to all connected lobsters except the specified one
+ */
+function broadcastLobbyUpdate(action, lobsterEntry, excludeLobsterId = null) {
+    const payload = JSON.stringify({
+        type: 'lobby_update',
+        action,
+        lobster: { id: lobsterEntry.id, name: lobsterEntry.name, summary: lobsterEntry.summary }
+    });
+
+    for (const [lid, ws] of lobsterClients.entries()) {
+        if (lid === excludeLobsterId) continue;
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(payload);
+        }
+    }
+}
+
+/**
  * Handle OpenClaw agent (lobster) WebSocket connections
  */
 async function handleLobsterConnection(ws, lobsterToken) {
@@ -106,11 +233,30 @@ async function handleLobsterConnection(ws, lobsterToken) {
         name: lobster.name
     }));
 
-    // Try to auto-pair if lobster is active and has no active chat
+    // Build public profile and add to lobby (for active lobsters)
     if (lobster.status === 'active') {
-        tryPairLobster(lobsterId).catch(err =>
-            console.error(`[WS/Lobster] Auto-pair failed for ${lobsterId}:`, err.message)
-        );
+        try {
+            const profile = await buildPublicProfile(lobsterId);
+            if (profile) {
+                lobby.set(lobsterId, { lobster, publicProfile: profile });
+
+                // Send current lobby (excluding self) to newly connected lobster
+                const lobbyList = [];
+                for (const [lid, entry] of lobby.entries()) {
+                    if (lid === lobsterId) continue;
+                    const p = entry.publicProfile;
+                    lobbyList.push({ id: p.id, name: p.name, summary: p.summary });
+                }
+                ws.send(JSON.stringify({ type: 'lobby', lobsters: lobbyList }));
+
+                // Broadcast join to all other connected lobsters
+                broadcastLobbyUpdate('join', profile, lobsterId);
+
+                console.log(`[WS/Lobster] ${lobster.name} joined lobby (${lobby.size} online)`);
+            }
+        } catch (err) {
+            console.error(`[WS/Lobster] Lobby join failed for ${lobsterId}:`, err.message);
+        }
     }
 
     ws.on('message', async (raw) => {
@@ -126,6 +272,15 @@ async function handleLobsterConnection(ws, lobsterToken) {
 
     ws.on('close', () => {
         lobsterClients.delete(lobsterId);
+
+        // Remove from lobby and broadcast leave
+        if (lobby.has(lobsterId)) {
+            const entry = lobby.get(lobsterId);
+            lobby.delete(lobsterId);
+            broadcastLobbyUpdate('leave', entry.publicProfile, null);
+            console.log(`[WS/Lobster] Agent ${lobsterId} left lobby (${lobby.size} online)`);
+        }
+
         console.log(`[WS/Lobster] Agent ${lobsterId} disconnected`);
     });
 
@@ -247,104 +402,187 @@ async function handleLobsterMessage(ws, lobsterId, ownerId, msg) {
 
         chatRooms.delete(chat_id);
 
-    } else if (type === 'find_match') {
-        // Agent requests a new pairing
+    } else if (type === 'request_chat') {
+        // Agent wants to chat with a specific lobster from the lobby
+        const { target_lobster_id, intro } = msg;
+        if (!target_lobster_id) {
+            ws.send(JSON.stringify({ type: 'error', message: 'request_chat requires target_lobster_id' }));
+            return;
+        }
+
+        // Validate target is in lobby
+        if (!lobby.has(target_lobster_id)) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Target lobster not in lobby (may have disconnected)' }));
+            return;
+        }
+
+        // Validate target is not self
+        if (target_lobster_id === lobsterId) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Cannot request chat with yourself' }));
+            return;
+        }
+
+        const requestId = uuidv4();
+        const requesterProfile = lobby.get(lobsterId)?.publicProfile;
+
+        // Store pending request
+        pendingRequests.set(requestId, {
+            from: lobsterId,
+            target: target_lobster_id,
+            intro: intro || ''
+        });
+
+        // Relay to target
+        const targetWs = lobsterClients.get(target_lobster_id);
+        if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+            targetWs.send(JSON.stringify({
+                type: 'chat_request',
+                request_id: requestId,
+                from: {
+                    id: lobsterId,
+                    name: requesterProfile?.name || 'Unknown',
+                    summary: requesterProfile?.summary || ''
+                },
+                intro: intro || ''
+            }));
+        } else {
+            // Target disconnected between lobby check and send
+            pendingRequests.delete(requestId);
+            ws.send(JSON.stringify({ type: 'error', message: 'Target lobster disconnected' }));
+        }
+
+    } else if (type === 'accept_chat') {
+        // Agent accepted a chat request
+        const { request_id } = msg;
+        if (!request_id) {
+            ws.send(JSON.stringify({ type: 'error', message: 'accept_chat requires request_id' }));
+            return;
+        }
+
+        const pending = pendingRequests.get(request_id);
+        if (!pending) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Request not found or expired' }));
+            return;
+        }
+
+        // Validate requester still online
+        if (!lobsterClients.has(pending.from)) {
+            pendingRequests.delete(request_id);
+            ws.send(JSON.stringify({ type: 'error', message: 'Requester is no longer online' }));
+            return;
+        }
+
+        pendingRequests.delete(request_id);
+
+        // Create chat room via orchestrator (DB record only, no scoring)
         try {
-            await tryPairLobster(lobsterId);
+            const chatId = await lobsterOrchestrator.initiateChat(pending.from, lobsterId);
+
+            // Fetch lobster details for both
+            const [lobsterARow, lobsterBRow] = await Promise.all([
+                pool.query(`SELECT l.lobster_id, l.name, l.conversation_style, l.owner_id FROM lobsters l WHERE l.lobster_id = $1`, [pending.from]),
+                pool.query(`SELECT l.lobster_id, l.name, l.conversation_style, l.owner_id FROM lobsters l WHERE l.lobster_id = $1`, [lobsterId])
+            ]);
+
+            const a = lobsterARow.rows[0];
+            const b = lobsterBRow.rows[0];
+
+            chatRooms.set(chatId, {
+                lobsterA: a.lobster_id,
+                lobsterB: b.lobster_id,
+                ownerA: a.owner_id,
+                ownerB: b.owner_id,
+                status: 'active'
+            });
+
+            const wsA = lobsterClients.get(a.lobster_id);
+            const wsB = lobsterClients.get(b.lobster_id);
+
+            if (wsA && wsA.readyState === WebSocket.OPEN) {
+                wsA.send(JSON.stringify({
+                    type: 'room_ready',
+                    chat_id: chatId,
+                    partner: { name: b.name, conversation_style: b.conversation_style }
+                }));
+            }
+            if (wsB && wsB.readyState === WebSocket.OPEN) {
+                wsB.send(JSON.stringify({
+                    type: 'room_ready',
+                    chat_id: chatId,
+                    partner: { name: a.name, conversation_style: a.conversation_style }
+                }));
+            }
+
+            // Notify owner UIs
+            broadcastToOwner(a.owner_id, {
+                type: 'lobster:chat_started',
+                chat_id: chatId,
+                partner_name: b.name,
+                partner_owner: (await pool.query(`SELECT nickname FROM users WHERE user_id = $1`, [b.owner_id])).rows[0]?.nickname
+            });
+            broadcastToOwner(b.owner_id, {
+                type: 'lobster:chat_started',
+                chat_id: chatId,
+                partner_name: a.name,
+                partner_owner: (await pool.query(`SELECT nickname FROM users WHERE user_id = $1`, [a.owner_id])).rows[0]?.nickname
+            });
+
+            console.log(`[WS] Chat room ${chatId} created: ${a.name} <-> ${b.name} (decentralized)`);
+        } catch (err) {
+            console.error('[WS/Lobster] accept_chat room creation failed:', err.message);
+            ws.send(JSON.stringify({ type: 'error', message: 'Failed to create chat room' }));
+        }
+
+    } else if (type === 'reject_chat') {
+        // Agent rejected a chat request
+        const { request_id, reason } = msg;
+        if (!request_id) {
+            ws.send(JSON.stringify({ type: 'error', message: 'reject_chat requires request_id' }));
+            return;
+        }
+
+        const pending = pendingRequests.get(request_id);
+        if (!pending) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Request not found or expired' }));
+            return;
+        }
+
+        pendingRequests.delete(request_id);
+
+        // Get target name for the rejection message
+        const targetEntry = lobby.get(lobsterId);
+        const targetName = targetEntry?.publicProfile?.name || 'Unknown';
+
+        // Relay rejection to requester
+        const requesterWs = lobsterClients.get(pending.from);
+        if (requesterWs && requesterWs.readyState === WebSocket.OPEN) {
+            requesterWs.send(JSON.stringify({
+                type: 'request_rejected',
+                request_id,
+                target_id: lobsterId,
+                target_name: targetName,
+                reason: reason || ''
+            }));
+        }
+
+    } else if (type === 'find_match') {
+        // Agent requests lobby refresh (deprecated auto-pair, now just sends current lobby)
+        try {
+            const lobbyList = [];
+            for (const [lid, entry] of lobby.entries()) {
+                if (lid === lobsterId) continue;
+                const p = entry.publicProfile;
+                lobbyList.push({ id: p.id, name: p.name, summary: p.summary });
+            }
+            ws.send(JSON.stringify({ type: 'lobby', lobsters: lobbyList }));
         } catch (err) {
             console.error('[WS/Lobster] find_match failed:', err.message);
-            ws.send(JSON.stringify({ type: 'error', message: 'Matching failed' }));
+            ws.send(JSON.stringify({ type: 'error', message: 'Lobby refresh failed' }));
         }
 
     } else {
         ws.send(JSON.stringify({ type: 'error', message: `Unknown message type: ${type}` }));
     }
-}
-
-/**
- * Try to pair a lobster with an available candidate
- */
-async function tryPairLobster(lobsterId) {
-    const candidates = await lobsterOrchestrator.discoverCandidates(lobsterId, 10);
-    if (candidates.length === 0) {
-        const ws = lobsterClients.get(lobsterId);
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'no_matches', message: 'No available candidates right now' }));
-        }
-        return;
-    }
-
-    // Find first candidate that is also connected
-    let partner = null;
-    for (const c of candidates) {
-        if (lobsterClients.has(c.lobster_id)) {
-            partner = c;
-            break;
-        }
-    }
-
-    if (!partner) {
-        const ws = lobsterClients.get(lobsterId);
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'waiting', message: 'No candidates online yet. Will notify when matched.' }));
-        }
-        return;
-    }
-
-    // Create chat room
-    const chatId = await lobsterOrchestrator.initiateChat(lobsterId, partner.lobster_id);
-
-    // Fetch lobster details for both
-    const [lobsterARow, lobsterBRow] = await Promise.all([
-        pool.query(`SELECT l.*, u.user_id as owner_id FROM lobsters l JOIN users u ON l.owner_id = u.user_id WHERE l.lobster_id = $1`, [lobsterId]),
-        pool.query(`SELECT l.*, u.user_id as owner_id FROM lobsters l JOIN users u ON l.owner_id = u.user_id WHERE l.lobster_id = $1`, [partner.lobster_id])
-    ]);
-
-    const a = lobsterARow.rows[0];
-    const b = lobsterBRow.rows[0];
-
-    chatRooms.set(chatId, {
-        lobsterA: a.lobster_id,
-        lobsterB: b.lobster_id,
-        ownerA: a.owner_id,
-        ownerB: b.owner_id,
-        status: 'active'
-    });
-
-    // Notify both agents
-    const wsA = lobsterClients.get(a.lobster_id);
-    const wsB = lobsterClients.get(b.lobster_id);
-
-    if (wsA && wsA.readyState === WebSocket.OPEN) {
-        wsA.send(JSON.stringify({
-            type: 'room_ready',
-            chat_id: chatId,
-            partner: { name: b.name, conversation_style: b.conversation_style }
-        }));
-    }
-    if (wsB && wsB.readyState === WebSocket.OPEN) {
-        wsB.send(JSON.stringify({
-            type: 'room_ready',
-            chat_id: chatId,
-            partner: { name: a.name, conversation_style: a.conversation_style }
-        }));
-    }
-
-    // Notify owner UIs
-    broadcastToOwner(a.owner_id, {
-        type: 'lobster:chat_started',
-        chat_id: chatId,
-        partner_name: b.name,
-        partner_owner: (await pool.query(`SELECT nickname FROM users WHERE user_id = $1`, [b.owner_id])).rows[0]?.nickname
-    });
-    broadcastToOwner(b.owner_id, {
-        type: 'lobster:chat_started',
-        chat_id: chatId,
-        partner_name: a.name,
-        partner_owner: (await pool.query(`SELECT nickname FROM users WHERE user_id = $1`, [a.owner_id])).rows[0]?.nickname
-    });
-
-    console.log(`[WS] Chat room ${chatId} created: ${a.name} <-> ${b.name}`);
 }
 
 /**
@@ -493,5 +731,7 @@ module.exports = {
     // Expose for testing/introspection
     _getOwnerClients: () => ownerClients,
     _getLobsterClients: () => lobsterClients,
-    _getChatRooms: () => chatRooms
+    _getChatRooms: () => chatRooms,
+    _getLobby: () => lobby,
+    _getPendingRequests: () => pendingRequests
 };

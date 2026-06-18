@@ -274,20 +274,12 @@ router.post('/me/respond', authenticate, requireSubscription, async (req, res) =
     }
 });
 
-// POST /api/lobsters/me/match-now - Trigger immediate matching cycle
+// POST /api/lobsters/me/match-now — DEPRECATED: matching is now decentralized via WebSocket lobby
 router.post('/me/match-now', authenticate, requireSubscription, async (req, res) => {
-    try {
-        const lobster = await pool.query(`SELECT lobster_id FROM lobsters WHERE owner_id = $1`, [req.userId]);
-        if (lobster.rows.length === 0) {
-            return res.status(404).json({ error: 'Lobster not found' });
-        }
-
-        await lobsterOrchestrator.runMatchingCycle();
-        res.json({ message: 'Matching cycle triggered' });
-    } catch (err) {
-        console.error('Error triggering match:', err);
-        res.status(500).json({ error: 'Failed to trigger matching' });
-    }
+    res.json({
+        message: 'Matching is now decentralized. Your lobster agent browses the lobby and initiates chats directly via WebSocket.',
+        deprecated: true
+    });
 });
 
 module.exports = router;

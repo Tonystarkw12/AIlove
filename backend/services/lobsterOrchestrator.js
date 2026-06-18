@@ -9,61 +9,8 @@ const crypto = require('./crypto');
 class LobsterOrchestrator {
 
     /**
-     * Get all active lobsters that need matching
-     */
-    async getActiveLobsters(limit = 50) {
-        const result = await pool.query(`
-            SELECT l.*, u.nickname as owner_nickname
-            FROM lobsters l
-            JOIN users u ON l.owner_id = u.user_id
-            WHERE l.status = 'active'
-            AND (l.last_active_at < NOW() - INTERVAL '10 minutes' OR l.last_active_at IS NULL)
-            ORDER BY l.last_active_at ASC NULLS FIRST
-            LIMIT $1
-        `, [limit]);
-        return result.rows;
-    }
-
-    /**
-     * Discover candidates for a lobster using existing matching algorithm
-     */
-    async discoverCandidates(lobsterId, limit = 20) {
-        const lobster = await pool.query(`
-            SELECT l.owner_id FROM lobsters WHERE lobster_id = $1
-        `, [lobsterId]);
-
-        if (lobster.rows.length === 0) return [];
-
-        const ownerId = lobster.rows[0].owner_id;
-
-        // Get users who are NOT the owner and have active lobsters
-        const candidates = await pool.query(`
-            SELECT u.user_id, l.lobster_id
-            FROM users u
-            JOIN lobsters l ON u.user_id = l.owner_id
-            WHERE u.user_id != $1
-            AND l.status = 'active'
-            AND NOT EXISTS (
-                SELECT 1 FROM lobster_chats lc
-                WHERE (lc.lobster_a_id = $2 AND lc.lobster_b_id = l.lobster_id)
-                   OR (lc.lobster_a_id = l.lobster_id AND lc.lobster_b_id = $2)
-                AND lc.session_status = 'active'
-            )
-            LIMIT $3
-        `, [ownerId, lobsterId, limit]);
-
-        // Score candidates using existing algorithm
-        const scored = [];
-        for (const c of candidates.rows) {
-            const score = await calculateMatchScore(ownerId, c.user_id);
-            scored.push({ ...c, matchScore: score });
-        }
-
-        return scored.sort((a, b) => b.matchScore - a.matchScore);
-    }
-
-    /**
-     * Initiate a lobster-to-lobster chat
+     * Initiate a lobster-to-lobster chat (DB record only, no scoring).
+     * Used by decentralized matching — agents decide via lobby, platform just creates the room.
      */
     async initiateChat(lobsterAId, lobsterBId) {
         const existing = await pool.query(`
@@ -82,34 +29,6 @@ class LobsterOrchestrator {
         `, [lobsterAId, lobsterBId]);
 
         return result.rows[0].chat_id;
-    }
-
-    /**
-     * Run a single matching cycle: discover -> initiate -> evaluate
-     */
-    async runMatchingCycle() {
-        console.log('[LobsterOrchestrator] Starting matching cycle...');
-        const lobsters = await this.getActiveLobsters();
-
-        for (const lobster of lobsters) {
-            try {
-                const candidates = await this.discoverCandidates(lobster.lobster_id);
-                const topCandidate = candidates[0];
-
-                if (topCandidate && topCandidate.matchScore > 50) {
-                    const chatId = await this.initiateChat(lobster.lobster_id, topCandidate.lobster_id);
-                    console.log(`[LobsterOrchestrator] Initiated chat ${chatId} between ${lobster.lobster_id} and ${topCandidate.lobster_id}`);
-                }
-
-                // Update last active
-                await pool.query(`
-                    UPDATE lobsters SET last_active_at = NOW()
-                    WHERE lobster_id = $1
-                `, [lobster.lobster_id]);
-            } catch (err) {
-                console.error(`[LobsterOrchestrator] Error processing lobster ${lobster.lobster_id}:`, err.message);
-            }
-        }
     }
 
     /**

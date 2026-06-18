@@ -1,3 +1,9 @@
+/**
+ * DEPRECATED: This module is no longer used in the decentralized matching flow.
+ * Matching decisions are now made by OpenClaw agents locally based on lobby profiles.
+ * Kept for backward compatibility with legacy API endpoints (map.js, recommendations.js).
+ */
+
 const pool = require('../db');
 const OpenAI = require('openai');
 const { getCachedMatchScore, cacheMatchScore } = require('./cacheService');

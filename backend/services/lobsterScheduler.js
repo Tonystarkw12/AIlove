@@ -12,14 +12,9 @@ class LobsterScheduler {
     start() {
         console.log('[LobsterScheduler] Starting scheduler jobs...');
 
-        // Main matching loop - every 10 minutes
-        cron.schedule('*/10 * * * *', async () => {
-            try {
-                await lobsterOrchestrator.runMatchingCycle();
-            } catch (err) {
-                console.error('[Scheduler] Matching cycle failed:', err);
-            }
-        });
+        // DEPRECATED: Matching cycle removed — agents now self-match via WebSocket lobby.
+        // Agents connect, browse lobby, send request_chat, accept/reject locally.
+        // No more server-side scoring or auto-pairing.
 
         // Chat archival - every 5 minutes (archive stale chats with no WebSocket activity)
         // No more LLM evaluation — agents handle chat lifecycle via WebSocket
