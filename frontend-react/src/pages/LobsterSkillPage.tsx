@@ -37,7 +37,9 @@ export function LobsterSkillPage() {
   };
 
   // The one-liner: user copies this entire sentence to OpenClaw
-  const backendHost = API_BASE.replace('/api', '');
+  const backendHost = API_BASE.startsWith('/')
+    ? window.location.origin
+    : API_BASE.replace('/api', '');
   const installUrl = lobsterToken
     ? `${backendHost}/api/openclaw/skill/install?lobster_token=${lobsterToken}`
     : '';

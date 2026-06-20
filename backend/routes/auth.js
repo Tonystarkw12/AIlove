@@ -1,8 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const pool = require('../db'); // Import pool from db.js
 const { v4: uuidv4 } = require('uuid'); // For generating user_id if not handled by DB default
+const subscriptionService = require('../services/subscriptionService');
 
 const router = express.Router();
 
@@ -48,6 +50,35 @@ router.post('/register', async (req, res) => {
 
         const result = await pool.query(newUserQuery, [userId, nickname, email, passwordHash]);
         const newUser = result.rows[0];
+
+        // Create free trial subscription (7 days)
+        try {
+            await subscriptionService.createTrialSubscription(userId);
+        } catch (subErr) {
+            console.error('Failed to create trial subscription:', subErr.message);
+            // Non-fatal: user can still use the app, just without subscription features
+        }
+
+        // Auto-create lobster for the new user
+        try {
+            const lobsterToken = crypto.randomBytes(32).toString('hex');
+            const lobsterName = `龙虾${Math.floor(Math.random() * 9000 + 1000)}`;
+
+            const lobsterResult = await pool.query(`
+                INSERT INTO lobsters (owner_id, name, conversation_style, avatar_url, lobster_token)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING lobster_id
+            `, [userId, lobsterName, 'friendly', 'friendly', lobsterToken]);
+
+            // Create empty preferences
+            await pool.query(`
+                INSERT INTO lobster_preferences (lobster_id)
+                VALUES ($1)
+            `, [lobsterResult.rows[0].lobster_id]);
+        } catch (lobsterErr) {
+            console.error('Failed to create lobster:', lobsterErr.message);
+            // Non-fatal
+        }
 
         // Generate JWT token
         const token = jwt.sign(

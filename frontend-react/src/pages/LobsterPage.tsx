@@ -371,22 +371,6 @@ export function LobsterPage() {
           </div>
         )}
 
-        {/* Conversation Style */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20">
-          <h2 className="text-lg font-bold text-white mb-3">龙虾性格</h2>
-          <div className="flex items-center justify-between">
-            <span className="text-[#B0E0E6]">对话风格</span>
-            <span className="bg-[#4ECDC4]/20 text-[#4ECDC4] px-3 py-1 rounded-full text-sm">
-              {lobster?.conversation_style === 'friendly' ? '友善型' :
-               lobster?.conversation_style === 'direct' ? '直接型' :
-               lobster?.conversation_style === 'playful' ? '活泼型' : '认真型'}
-            </span>
-          </div>
-          <a href="/lobster-settings" className="block mt-3 text-[#87CEEB] text-sm text-center underline">
-            修改龙虾设置 →
-          </a>
-        </div>
-
         {/* Quick Links */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
           <h2 className="text-lg font-bold text-white mb-3">快捷入口</h2>
@@ -397,18 +381,6 @@ export function LobsterPage() {
             </a>
             <a href="/lobster/chat" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
               <span className="text-[#B0E0E6]">💬 龙虾对话</span>
-              <span className="text-[#87CEEB]">→</span>
-            </a>
-            <a href="/recommendations" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-              <span className="text-[#B0E0E6]">💕 匹配推荐</span>
-              <span className="text-[#87CEEB]">→</span>
-            </a>
-            <a href="/consents" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-              <span className="text-[#B0E0E6]">🤝 微信交换</span>
-              <span className="text-[#87CEEB]">→</span>
-            </a>
-            <a href="/introductions" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-              <span className="text-[#B0E0E6]">💌 介绍历史</span>
               <span className="text-[#87CEEB]">→</span>
             </a>
             <a href="/subscription" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">

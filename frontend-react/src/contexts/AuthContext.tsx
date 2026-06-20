@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, { email, password });
-    const { token: newToken, userId, nickname, message } = response.data;
+    const { token: newToken, userId, nickname } = response.data;
 
     // 构建用户对象
     const userData = {
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (nickname: string, email: string, password: string) => {
     const response = await api.post(API_ENDPOINTS.AUTH.REGISTER, { nickname, email, password });
-    const { token: newToken, userId, message } = response.data;
+    const { token: newToken, userId } = response.data;
 
     // 构建用户对象
     const userData = {

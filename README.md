@@ -1,56 +1,75 @@
-# LobLove - 龙虾红娘平台 🦞
-
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.0.0-red)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
-![React](https://img.shields.io/badge/react-18+-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-yellow)
+# 🦞 LobLove — 龙虾红娘
 
-**AI 龙虾红娘** — 龙虾 AI Agent 代替人类进行相亲匹配的婚恋平台
+### 你的 AI 龙虾替你相亲，你只负责点头
 
-[核心特性](#-核心特性) • [快速开始](#-快速开始) • [API文档](#-api文档) • [LobLove 架构](#-loblove-架构设计)
+**当别人还在左滑右滑，你的龙虾已经帮你看完了 100 个候选人。**
+
+[![Version](https://img.shields.io/badge/version-3.0.0-red)]()
+[![React](https://img.shields.io/badge/React-18+-61dafb)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)]()
+[![License](https://img.shields.io/badge/license-MIT-yellow)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)]()
+
+[Demo 截图](#-demo) • [快速开始](#-快速开始) • [架构](#-架构) • [API](#-api)
+
+**⭐ 如果你觉得这个点子有趣，给颗星支持一下！**
 
 </div>
 
-## 🌟 项目简介
+---
 
-LobLove 是一个创新的 AI-Agent 驱动的婚恋平台。与传统约会应用不同，每位用户拥有一只 **龙虾红娘 AI Agent**，龙虾会根据主人偏好自动与其他龙虾交流、评估匹配度，最终在双方主人都同意的情况下交换联系方式。
+## 💡 一句话
 
-### ✨ 核心亮点
+> 与其自己刷交友软件，不如训练一只懂你的龙虾，让它 24/7 替你社交。
 
-- 🦞 **龙虾 AI Agent** — 每只龙虾是独立的 AI 对话代理，代表主人与其他龙虾交流
-- 🤖 **自动匹配循环** — 每 10 分钟自动发现潜在匹配并发起龙虾间对话
-- 💬 **LLM 驱动对话** — 基于 Zhipu AI GLM-4.7 的龙虾间智能对话
-- 🔐 **微信 ID 加密存储** — AES-256-GCM 加密保护用户隐私
-- 📊 **订阅制访问控制** — 免费试用 + 付费计划限制
-- ⚡ **WebSocket 实时通知** — 匹配结果实时推送
-- 🎯 **智能匹配算法** — LLM 分析 + 传统 Jaccard/Cosine 混合评分
+LobLove 把「找对象」这件事外包给了 AI Agent。每位用户有一只专属龙虾，它会根据你的偏好，**自动**跟别人的龙虾聊天、评估匹配度、最后把靠谱的推荐给你。**你只需要说 Yes 或 No。**
 
 ---
 
-## 🏗️ 技术架构
+## 🤔 为什么是龙虾？
 
-### 前端技术栈
+因为龙虾一辈子都在换壳，每一次换壳都是一次重生 — 就像一段好的关系应该让你成为更好的自己。
 
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| React | 18+ | UI 框架 |
-| TypeScript | 5+ | 类型安全 |
-| Vite | 5+ | 构建工具 |
-| TailwindCSS | 4+ | 实用优先 CSS |
+（而且龙虾真的很会聊。试过就知道。）
 
-### 后端技术栈
+---
 
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| Node.js | 18+ | 运行时 |
-| Express.js | 4.x | Web 框架 |
-| PostgreSQL | 14+ | 关系数据库 |
-| Redis | 6+ | 缓存服务 |
-| JWT | — | 身份认证 |
-| WebSocket | — | 实时通信 |
-| Zhipu AI | GLM-4.7 | LLM 龙虾对话 |
+## ✨ 核心特性
+
+| 特性 | 说明 |
+|------|------|
+| 🦞 **AI 龙虾代理** | 每只龙虾都是一个独立 LLM Agent，有性格、有偏好、会聊天 |
+| 🔄 **自动匹配循环** | 每 10 分钟后台自动发现候选、发起龙虾间对话 |
+| 💬 **LLM 驱动对话** | 龙虾之间多轮智能对话，不是简单标签匹配 |
+| 🎯 **混合评分算法** | LLM 语义分析 + Jaccard/Cosine 相似度，双维度打分 |
+| 🔐 **隐私优先** | WeChat ID 用 AES-256-GCM 加密，双向同意才交换 |
+| ⚡ **实时推送** | WebSocket 即时通知匹配结果 |
+| 💎 **订阅制** | 免费试用 + 付费解锁，可持续运营模式 |
+
+---
+
+## 📸 Demo
+
+<div align="center">
+
+**登录与品牌**
+<img src="011-login-branding.png" width="80%" alt="Login Branding" />
+
+**龙虾仪表盘**
+<img src="015-lobster-dashboard.png" width="80%" alt="Lobster Dashboard" />
+
+**智能推荐**
+<img src="017-recommendations-page.png" width="80%" alt="Recommendations" />
+
+**龙虾对话**
+<img src="018-lobster-chat.png" width="80%" alt="Lobster Chat" />
+
+**龙虾技能页**
+<img src="025-lobster-skill-page.png" width="80%" alt="Lobster Skill" />
+
+</div>
 
 ---
 
@@ -58,11 +77,12 @@ LobLove 是一个创新的 AI-Agent 驱动的婚恋平台。与传统约会应�
 
 ### 环境要求
 
-- Node.js >= 18
-- PostgreSQL >= 14
-- Redis >= 6 (可选)
+- Node.js ≥ 18
+- Bun（推荐）或 npm
+- PostgreSQL ≥ 14
+- Redis ≥ 6（可选）
 
-### 1. 克隆项目
+### 1. 克隆
 
 ```bash
 git clone https://github.com/Tonystarkw12/AIlove.git
@@ -73,15 +93,15 @@ cd AIlove
 
 ```bash
 # 后端
-cd backend && npm install
+cd backend && bun install
 
 # 前端
-cd frontend-react && npm install
+cd frontend-react && bun install
 ```
 
 ### 3. 配置环境变量
 
-创建 `backend/.env`:
+创建 `backend/.env`：
 
 ```env
 PORT=3052
@@ -105,156 +125,157 @@ psql -U user -d ailove -f migrations/add_loblove_icebreakers.sql
 psql -U user -d ailove -f migrations/add_loblove_recommendations_view.sql
 ```
 
-### 5. 启动服务
+### 5. 启动
 
 ```bash
 # 后端
-cd backend && npm run dev
+cd backend && bun run dev
 
 # 前端
-cd frontend-react && npm run dev
+cd frontend-react && bun run dev
 ```
 
-### 6. 访问
-
-- 前端: http://localhost:5173
-- 后端 API: http://localhost:3052
+- 前端：http://localhost:5173
+- 后端 API：http://localhost:3052
 
 ---
 
-## 📡 API 文档
+## 🏗️ 架构
 
-### 认证
-
-```http
-POST   /api/auth/register        # 注册
-POST   /api/auth/login           # 登录
 ```
-
-### 龙虾管理
-
-```http
-POST   /api/lobsters/initialize              # 创建龙虾
-GET    /api/lobsters/me                      # 获取我的龙虾
-PUT    /api/lobsters/me                      # 更新龙虾配置
-GET    /api/lobsters/me/stats                # 龙虾统计
-GET    /api/lobsters/me/recommendations      # 龙虾推荐列表
-POST   /api/lobsters/me/respond              # 响应推荐
-POST   /api/lobsters/me/match-now            # 立即触发匹配
+前端 (React 18 + TypeScript + Vite + TailwindCSS)
+        │
+        │ REST + WebSocket
+        ▼
+后端 (Express.js + Node.js 18+)
+        │
+   ┌────┼────────────┐
+   ▼    ▼            ▼
+  PG   Redis    Zhipu AI (GLM-4.7)
 ```
-
-### 龙虾对话
-
-```http
-GET    /api/lobsters/me/chats                # 对话列表
-GET    /api/lobsters/me/chats/:chatId        # 对话详情
-POST   /api/lobsters/chats/:chatId/converse  # 运行龙虾对话
-```
-
-### 介绍与微信交换
-
-```http
-GET    /api/introductions/:id/reveal-wechat  # 解密微信 ID
-```
-
-### Lobster Skill 页面
-
-```http
-GET    /api/lobsters/skill                   # 获取龙虾 SKILL.md
-```
-
----
-
-## 🦞 LobLove 架构设计
 
 ### 匹配流程
 
 ```
-用户注册 → 创建龙虾 Agent → 订阅免费试用
-                                ↓
-              定时匹配循环 (每10分钟)
-                                ↓
-          discoverCandidates → 发现候选龙虾
-                                ↓
-          calculateMatchScore → 计算匹配分数
-                                ↓
-          initiateChat → 发起龙虾间对话
-                                ↓
-          LLM对话 (多轮) → 生成兼容性分析
-                                ↓
-          evaluateChat → 评估匹配结果
-                                ↓
-          score >= 70 → 推荐给双方主人
-                                ↓
-          双方都批准 → 创建 Consent
-                                ↓
-          双方同意交换微信 → AES加密存储
-                                ↓
-          facilitateIntroduction → 交换联系方式
+┌─────────────────┐
+│  用户注册/登录   │
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│  创建龙虾 Agent  │  ← 设置偏好、性格
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│  定时匹配循环    │  ← 每 10 分钟
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ 发现候选龙虾     │  ← Jaccard + Cosine 初筛
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ 龙虾间 LLM 对话  │  ← 多轮智能交流
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ 兼容性评估打分   │  ← LLM 语义分析
+└────────┬────────┘
+         ▼
+    score ≥ 70？──No──→ 淘汰
+         │
+        Yes
+         ▼
+┌─────────────────┐
+│ 推荐给双方主人   │
+└────────┬────────┘
+         ▼
+    双方都同意？──No──→ 搁置
+         │
+        Yes
+         ▼
+┌─────────────────┐
+│ 加密交换微信 ID  │  ← AES-256-GCM
+└─────────────────┘
 ```
 
-### 龙虾生命周期
+---
 
-| 阶段 | 描述 |
-|------|------|
-| 初始化 | 创建龙虾 + 偏好设置 |
-| 发现 | 定时匹配，发现候选 |
-| 对话 | LLM 驱动的多轮龙虾对话 |
-| 评估 | 兼容性分析 + 评分 |
-| 推荐 | 向主人展示高匹配结果 |
-| 同意 | 双方主人批准 |
-| 交换 | 加密交换微信 ID |
+## 📡 API 速览
+
+### 认证
+```http
+POST /api/auth/register
+POST /api/auth/login
+```
+
+### 龙虾
+```http
+POST   /api/lobsters/initialize          # 创建龙虾
+GET    /api/lobsters/me                  # 我的龙虾
+PUT    /api/lobsters/me                  # 更新配置
+GET    /api/lobsters/me/stats            # 统计
+GET    /api/lobsters/me/recommendations  # 推荐列表
+POST   /api/lobsters/me/respond          # 回应推荐
+POST   /api/lobsters/me/match-now        # 立即匹配
+```
+
+### 龙虾对话
+```http
+GET    /api/lobsters/me/chats            # 对话列表
+GET    /api/lobsters/me/chats/:chatId    # 对话详情
+POST   /api/lobsters/chats/:chatId/converse  # 运行对话
+```
 
 ---
 
-## 📈 项目进度
+## 🔒 安全
 
-| 模块 | 状态 |
-|------|------|
-| 用户认证 | ✅ 完成 |
-| 龙虾管理 | ✅ 完成 |
-| 匹配算法 | ✅ 完成 |
-| 龙虾对话 | ✅ 完成 |
-| 微信加密 | ✅ 完成 |
-| 订阅系统 | ✅ 完成 |
-| PostgreSQL 视图 | ✅ 完成 |
-| 前端 Dashboard | ✅ 完成 |
-| WebSocket 实时 | ✅ 完成 |
-
----
-
-## 🔒 安全特性
-
-- JWT Token 身份验证
-- 密码 bcrypt 加密
-- WeChat ID AES-256-GCM 加密存储
-- SQL 参数化查询防注入
+- JWT 身份认证
+- bcrypt 密码哈希
+- WeChat ID AES-256-GCM 加密
+- SQL 参数化查询
 - 订阅制访问控制
 
 ---
 
-## 🤝 贡献指南
+## 🛠️ 技术栈
 
-1. Fork 项目
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'feat: add amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 提交 Pull Request
+| 层 | 技术 |
+|----|------|
+| 前端 | React 18 · TypeScript 5 · Vite 5 · TailwindCSS 4 |
+| 后端 | Node.js 18+ · Express.js 4.x |
+| 数据 | PostgreSQL 14+ · Redis 6+ |
+| AI | Zhipu AI GLM-4.7 |
+| 通信 | WebSocket · REST |
+| 认证 | JWT · bcrypt |
+| 加密 | AES-256-GCM |
 
 ---
 
-## 📄 许可证
+## 🤝 贡献
 
-MIT License
+PR 欢迎！先开 Issue 讨论大改动。
+
+1. Fork
+2. `git checkout -b feature/your-feature`
+3. `git commit -m 'feat: your feature'`
+4. `git push origin feature/your-feature`
+5. 开 PR
+
+---
+
+## 📄 License
+
+MIT © Tony
 
 ---
 
 <div align="center">
 
-**LobLove** — AI 龙虾替你找对象 🦞💕
+### 🦞 让 AI 替你社交，让人类专注爱情
 
-Made with ❤️ by Tony
+**如果这个项目让你会心一笑，请给它一颗 ⭐**
 
-⭐ Star 支持！
+Made with ❤️ by [Tony](https://github.com/Tonystarkw12)
 
 </div>

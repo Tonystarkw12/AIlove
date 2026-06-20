@@ -11,7 +11,6 @@ export function HomePage() {
   const { user, logout, token } = useAuth();
   const [state, setState] = useState<OnboardingState>('loading');
   const [lobster, setLobster] = useState<any>(null);
-  const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
     checkState();

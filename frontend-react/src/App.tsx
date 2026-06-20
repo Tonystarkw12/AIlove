@@ -10,7 +10,6 @@ import { LobsterSkillPage } from './pages/LobsterSkillPage';
 import { SubscriptionPage } from './pages/SubscriptionPage';
 import { ConsentPage } from './pages/ConsentPage';
 import { TabBar } from './components/TabBar';
-import { MusicPlayer } from './components/MusicPlayer';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -18,8 +17,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
-        <div className="text-2xl animate-pulse">加载中...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33]">
+        <div className="text-4xl animate-pulse">🦞</div>
       </div>
     );
   }
@@ -33,8 +32,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
-      <MusicPlayer autoPlay={false} />
+    <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33]">
       {children}
       <TabBar />
     </div>
@@ -50,9 +48,7 @@ function AppRoutes() {
         path="/"
         element={
           <ProtectedRoute>
-            <AppLayout>
-              <HomePage />
-            </AppLayout>
+            <AppLayout><HomePage /></AppLayout>
           </ProtectedRoute>
         }
       />
@@ -60,18 +56,15 @@ function AppRoutes() {
         path="/profile"
         element={
           <ProtectedRoute>
-            <AppLayout>
-              <ProfilePage />
-            </AppLayout>
+            <AppLayout><ProfilePage /></AppLayout>
           </ProtectedRoute>
         }
       />
-      {/* LobLove Routes */}
       <Route
         path="/lobster"
         element={
           <ProtectedRoute>
-            <LobsterPage />
+            <AppLayout><LobsterPage /></AppLayout>
           </ProtectedRoute>
         }
       />
@@ -79,23 +72,7 @@ function AppRoutes() {
         path="/lobster/skill"
         element={
           <ProtectedRoute>
-            <LobsterSkillPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/subscription"
-        element={
-          <ProtectedRoute>
-            <SubscriptionPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/consents"
-        element={
-          <ProtectedRoute>
-            <ConsentPage />
+            <AppLayout><LobsterSkillPage /></AppLayout>
           </ProtectedRoute>
         }
       />
@@ -103,7 +80,23 @@ function AppRoutes() {
         path="/lobster/chat"
         element={
           <ProtectedRoute>
-            <LobsterChatPage />
+            <AppLayout><LobsterChatPage /></AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/subscription"
+        element={
+          <ProtectedRoute>
+            <AppLayout><SubscriptionPage /></AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/consents"
+        element={
+          <ProtectedRoute>
+            <AppLayout><ConsentPage /></AppLayout>
           </ProtectedRoute>
         }
       />

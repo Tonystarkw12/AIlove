@@ -15,22 +15,22 @@ const tabs: TabItem[] = [
 
 export function TabBar() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#0F380F] border-t-4 border-black z-50">
-      <div className="flex justify-around items-center h-14">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#0d1f33]/95 backdrop-blur-md border-t border-white/10 z-50 safe-area-bottom">
+      <div className="flex justify-around items-center h-16 max-w-md mx-auto">
         {tabs.map((tab) => (
           <NavLink
             key={tab.path}
             to={tab.path}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center w-full h-full transition-colors ${
+              `flex flex-col items-center justify-center w-full h-full transition-all duration-200 ${
                 isActive
-                  ? 'bg-[#306230] text-white'
-                  : 'text-[#9BBC0F] hover:bg-[#306230]/50'
+                  ? 'text-[#ff6b6b] scale-105'
+                  : 'text-[#87CEEB]/60 hover:text-[#87CEEB]'
               }`
             }
           >
-            <span className="text-xl">{tab.icon}</span>
-            <span className="text-xs mt-0.5 font-bold">{tab.label}</span>
+            <span className="text-2xl mb-0.5">{tab.icon}</span>
+            <span className="text-[10px] font-medium">{tab.label}</span>
           </NavLink>
         ))}
       </div>
