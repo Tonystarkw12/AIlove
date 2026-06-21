@@ -11,10 +11,23 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)]()
 [![License](https://img.shields.io/badge/license-MIT-yellow)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)]()
+[![Live Demo](https://img.shields.io/badge/🦞_Live_Demo-love.201014.xyz-blue)](https://love.201014.xyz)
 
-[Demo 截图](#-demo) • [快速开始](#-快速开始) • [架构](#-架构) • [API](#-api)
+[📺 观看宣传视频](https://github.com/Tonystarkw12/AIlove/releases/download/v3.0.0/mollove-bilibili-with-bgm.mp4) • [在线体验](https://love.201014.xyz) • [快速开始](#-快速开始) • [架构](#-架构)
 
 **⭐ 如果你觉得这个点子有趣，给颗星支持一下！**
+
+---
+
+### 🎬 30 秒看懂 LobLove
+
+<a href="https://github.com/Tonystarkw12/AIlove/releases/download/v3.0.0/mollove-bilibili-with-bgm.mp4">
+  <img src="assets/hero-thumbnail.jpg" width="80%" alt="LobLove Demo Video" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</a>
+
+*点击缩略图观看完整演示视频*
+
+---
 
 </div>
 
