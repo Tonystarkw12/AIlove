@@ -21,11 +21,9 @@
 
 ### 🎬 30 秒看懂 LobLove
 
-<a href="https://github.com/Tonystarkw12/AIlove/releases/download/v3.0.0/mollove-bilibili-with-bgm.mp4">
-  <img src="assets/hero-thumbnail.jpg" width="80%" alt="LobLove Demo Video" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
-</a>
+<img src="assets/demo.gif" width="80%" alt="LobLove Demo" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
 
-*点击缩略图观看完整演示视频*
+<a href="https://github.com/Tonystarkw12/AIlove/releases/download/v3.0.0/mollove-bilibili-with-bgm.mp4">📺 观看完整宣传视频（含音乐）</a>
 
 ---
 
