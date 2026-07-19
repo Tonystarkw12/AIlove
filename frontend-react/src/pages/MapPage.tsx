@@ -26,7 +26,10 @@ export function MapPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedUser, setSelectedUser] = useState<NearbyUser | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  // AMap loader does not expose usable instance types.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const amapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +46,8 @@ export function MapPage() {
     if (userLocation && mapRef.current) {
       fetchNearbyUsers();
     }
+    // Nearby search is intentionally driven by location and radius.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userLocation, radius]);
 
   const initMap = async () => {
@@ -87,6 +92,7 @@ export function MapPage() {
           timeout: 10000,
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         geolocation.getCurrentPosition((status: string, result: any) => {
           console.log('定位结果:', status, result);
           if (status === 'complete') {

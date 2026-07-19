@@ -25,23 +25,36 @@ export function ChatPage() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    fetchChatUsers();
-    return () => {
-      if (ws) ws.close();
-    };
+    void fetchChatUsers();
   }, []);
 
   useEffect(() => {
-    if (selectedUser) {
-      fetchMessages(selectedUser.user_id);
-      connectWebSocket();
-    }
-    return () => {
-      if (ws) ws.close();
+    if (!selectedUser) return;
+
+    void fetchMessages(selectedUser.user_id);
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const websocket = new WebSocket(`${WS_URL}?token=${token}`);
+    websocket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (
+          data.type === 'new_message'
+          && (data.message.sender_id === selectedUser.user_id
+            || data.message.receiver_id === selectedUser.user_id)
+        ) {
+          setMessages((previous) => [...previous, data.message]);
+        }
+      } catch (error) {
+        console.error('Invalid WebSocket message:', error);
+      }
     };
+    websocket.onerror = (error) => console.error('WebSocket error:', error);
+
+    return () => websocket.close();
   }, [selectedUser]);
 
   useEffect(() => {
@@ -66,36 +79,6 @@ export function ChatPage() {
     } catch (error) {
       console.error('Failed to fetch messages:', error);
     }
-  };
-
-  const connectWebSocket = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    const wsUrl = `${WS_URL}?token=${token}`;
-    const websocket = new WebSocket(wsUrl);
-
-    websocket.onopen = () => {
-      console.log('WebSocket connected');
-    };
-
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'new_message' && selectedUser) {
-        if (
-          data.message.sender_id === selectedUser.user_id ||
-          data.message.receiver_id === selectedUser.user_id
-        ) {
-          setMessages((prev) => [...prev, data.message]);
-        }
-      }
-    };
-
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    setWs(websocket);
   };
 
   const sendMessage = async () => {

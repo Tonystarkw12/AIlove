@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -64,8 +65,8 @@ export function PokeballPage() {
 
       alert(`充值成功！获得 ${option.pokeball} 个精灵球`);
       fetchData();
-    } catch (error: any) {
-      const msg = error.response?.data?.error?.message || '充值失败，请重试';
+    } catch (error: unknown) {
+      const msg = axios.isAxiosError(error) ? error.response?.data?.error?.message || '充值失败，请重试' : '充值失败，请重试';
       alert(msg);
     } finally {
       setSubmitting(false);

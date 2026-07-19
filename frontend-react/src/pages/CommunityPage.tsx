@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { GameboyButton } from '../components/GameboyButton';
 
@@ -21,6 +20,8 @@ export function CommunityPage() {
 
   useEffect(() => {
     fetchPhotos();
+    // Fetch is intentionally driven only by pagination.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const fetchPhotos = async () => {

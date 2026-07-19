@@ -32,7 +32,7 @@ class SubscriptionService {
      */
     async hasAccess(userId) {
         const result = await pool.query(`
-            SELECT plan_type, status, trial_ends_at, paid_ends_at
+            SELECT user_id, plan_type, status, trial_ends_at, paid_ends_at
             FROM subscriptions
             WHERE user_id = $1 AND status = 'active'
         `, [userId]);
@@ -162,7 +162,7 @@ class SubscriptionService {
             const count = await pool.query(`
                 SELECT COUNT(*) FROM introductions i
                 JOIN consents c ON i.consent_id = c.consent_id
-                WHERE c.owner_a_id = $1 OR c.owner_b_id = $1
+                WHERE (c.owner_a_id = $1 OR c.owner_b_id = $1)
                 AND i.created_at > NOW() - INTERVAL '1 month'
             `, [userId]);
 

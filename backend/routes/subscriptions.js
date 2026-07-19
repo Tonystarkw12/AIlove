@@ -42,22 +42,8 @@ router.post('/start-trial', authenticate, async (req, res) => {
 });
 
 // POST /api/subscriptions/upgrade - Upgrade to paid plan
-router.post('/upgrade', authenticate, async (req, res) => {
-    try {
-        const { planType, paymentMethod, externalTransactionId } = req.body;
-        if (!['monthly', 'quarterly', 'annual'].includes(planType)) {
-            return res.status(400).json({ error: 'Invalid plan type' });
-        }
-
-        const result = await subscriptionService.upgradeSubscription(
-            req.userId, planType, paymentMethod || 'wechat_pay', externalTransactionId
-        );
-
-        res.json({ message: 'Subscription upgraded', ...result });
-    } catch (err) {
-        console.error('Error upgrading subscription:', err);
-        res.status(500).json({ error: err.message });
-    }
+router.post('/upgrade', authenticate, (_req, res) => {
+    res.status(503).json({ error: 'Payment verification is not configured' });
 });
 
 // POST /api/subscriptions/cancel - Cancel subscription
@@ -71,15 +57,8 @@ router.post('/cancel', authenticate, async (req, res) => {
 });
 
 // POST /api/subscriptions/webhook - Payment provider webhook
-router.post('/webhook', async (req, res) => {
-    try {
-        const { provider, payload } = req.body;
-        await subscriptionService.processWebhook(provider, payload);
-        res.json({ received: true });
-    } catch (err) {
-        console.error('Webhook error:', err);
-        res.status(500).json({ error: 'Webhook processing failed' });
-    }
+router.post('/webhook', (_req, res) => {
+    res.status(503).json({ error: 'Payment webhook verification is not configured' });
 });
 
 // GET /api/subscriptions/usage - Get current usage vs limits

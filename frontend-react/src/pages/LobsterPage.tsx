@@ -9,13 +9,13 @@ interface Lobster {
   lobster_id: string;
   owner_id: string;
   name: string;
-  personality_profile: any;
+  personality_profile: Record<string, unknown>;
   avatar_url: string | null;
   status: 'active' | 'paused' | 'suspended';
   total_matches_evaluated: number;
   total_introductions_facilitated: number;
   last_active_at: string;
-  matching_criteria: any;
+  matching_criteria: Record<string, unknown>;
   dealbreakers: string[];
   conversation_style: string;
   created_at: string;
@@ -45,9 +45,13 @@ export function LobsterPage() {
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
   const [trialCountdown, setTrialCountdown] = useState('');
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
     fetchLobsterData();
+    // Initial authenticated fetch only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Real-time trial countdown
@@ -75,21 +79,24 @@ export function LobsterPage() {
   };
 
   const fetchLobsterData = async () => {
+    setError('');
     try {
-      const [lobsterRes, statsRes, subRes] = await Promise.all([
-        axios.get(`${API_BASE}/lobsters/me`, authHeaders).catch(() => null),
-        axios.get(`${API_BASE}/lobsters/me/stats`, authHeaders).catch(() => null),
-        axios.get(`${API_BASE}/subscriptions/me`, authHeaders).catch(() => null),
-      ]);
+      const lobsterRes = await axios.get(`${API_BASE}/lobsters/me`, authHeaders);
+      setLobster(lobsterRes.data.lobster);
+      setInitialized(Boolean(lobsterRes.data.lobster));
 
-      if (lobsterRes?.data?.lobster) {
-        setLobster(lobsterRes.data.lobster);
-        setInitialized(true);
-      }
-      if (statsRes?.data) setStats(statsRes.data);
-      if (subRes?.data) setSubscription(subRes.data);
+      const [statsRes, subRes] = await Promise.allSettled([
+        axios.get(`${API_BASE}/lobsters/me/stats`, authHeaders),
+        axios.get(`${API_BASE}/subscriptions/me`, authHeaders),
+      ]);
+      if (statsRes.status === 'fulfilled') setStats(statsRes.value.data);
+      if (subRes.status === 'fulfilled') setSubscription(subRes.value.data);
     } catch (err) {
-      console.error('Failed to fetch lobster data:', err);
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
+        setInitialized(false);
+      } else {
+        setError('龙虾数据加载失败，请检查网络后重试');
+      }
     } finally {
       setLoading(false);
     }
@@ -104,8 +111,8 @@ export function LobsterPage() {
         setInitialized(true);
       }
       await fetchLobsterData();
-    } catch (err) {
-      console.error('Failed to initialize lobster:', err);
+    } catch {
+      setError('龙虾激活失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -124,9 +131,13 @@ export function LobsterPage() {
   const triggerMatch = async () => {
     try {
       await axios.post(`${API_BASE}/lobsters/me/match-now`, {}, authHeaders);
-    } catch (err: any) {
-      if (err.response?.status === 402) {
-        alert('订阅已过期，请升级后继续匹配');
+      setNotice('匹配任务已启动，龙虾会在后台寻找合适对象');
+      setError('');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.status === 402) {
+        setError('订阅已过期，请升级后继续匹配');
+      } else {
+        setError('匹配启动失败，请稍后重试');
       }
     }
   };
@@ -152,6 +163,19 @@ export function LobsterPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
         <div className="text-2xl animate-pulse text-[#ff6b6b]">龙虾加载中...</div>
+      </div>
+    );
+  }
+
+  if (error && !initialized) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center p-4">
+        <div className="bg-white/10 border border-white/20 rounded-2xl p-6 text-center max-w-md">
+          <p role="alert" className="text-[#ff8e8e] mb-4">{error}</p>
+          <button onClick={() => { setLoading(true); void fetchLobsterData(); }} className="bg-[#ff6b6b] text-white font-bold py-3 px-6 rounded-xl">
+            重新加载
+          </button>
+        </div>
       </div>
     );
   }
@@ -289,6 +313,9 @@ export function LobsterPage() {
           </div>
         )}
 
+        {error && <p role="alert" className="mb-4 rounded-xl bg-red-500/20 p-3 text-center text-[#ffb3b3]">{error}</p>}
+        {notice && <p role="status" className="mb-4 rounded-xl bg-emerald-500/20 p-3 text-center text-[#b8f5d2]">{notice}</p>}
+
         {/* Controls */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-white/20">
           <h2 className="text-lg font-bold text-white mb-3">龙虾控制</h2>
@@ -319,9 +346,6 @@ export function LobsterPage() {
                lobster?.conversation_style === 'playful' ? '活泼型' : '认真型'}
             </span>
           </div>
-          <a href="/lobster-settings" className="block mt-3 text-[#87CEEB] text-sm text-center underline">
-            修改龙虾设置 →
-          </a>
         </div>
 
         {/* Quick Links */}
@@ -334,10 +358,6 @@ export function LobsterPage() {
             </a>
             <a href="/lobster/chat" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
               <span className="text-[#B0E0E6]">💬 龙虾对话</span>
-              <span className="text-[#87CEEB]">→</span>
-            </a>
-            <a href="/recommendations" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-              <span className="text-[#B0E0E6]">💕 匹配推荐</span>
               <span className="text-[#87CEEB]">→</span>
             </a>
             <a href="/consents" className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">

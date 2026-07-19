@@ -34,6 +34,8 @@ export function LobsterChatPage() {
 
   useEffect(() => {
     fetchChats();
+    // Initial authenticated fetch only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
@@ -138,7 +140,7 @@ export function LobsterChatPage() {
                     alert('已批准！等待对方确认后龙虾会帮你们交换微信号');
                     fetchChats();
                     setSelectedChat(null);
-                  } catch (err) {
+                  } catch {
                     alert('操作失败');
                   }
                 }}
@@ -155,7 +157,7 @@ export function LobsterChatPage() {
                     }, authHeaders);
                     fetchChats();
                     setSelectedChat(null);
-                  } catch (err) {
+                  } catch {
                     alert('操作失败');
                   }
                 }}

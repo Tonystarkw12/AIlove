@@ -27,10 +27,11 @@ export function SubscriptionPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
-  const [upgrading, setUpgrading] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
+    // Initial authenticated fetch only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
@@ -47,28 +48,6 @@ export function SubscriptionPage() {
       console.error('Failed to fetch subscription data:', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const upgrade = async (planType: string) => {
-    setUpgrading(planType);
-    try {
-      // For now, simulate upgrade (real integration would go to payment page)
-      const res = await axios.post(`${API_BASE}/subscriptions/upgrade`, {
-        planType,
-        paymentMethod: 'wechat_pay',
-        externalTransactionId: `manual_${Date.now()}`
-      }, authHeaders);
-
-      if (res.data.subscriptionId) {
-        alert('升级成功！');
-        fetchData();
-      }
-    } catch (err: any) {
-      console.error('Upgrade failed:', err);
-      alert('升级失败，请稍后重试');
-    } finally {
-      setUpgrading(null);
     }
   };
 
@@ -164,16 +143,10 @@ export function SubscriptionPage() {
               </ul>
 
               <button
-                onClick={() => upgrade(plan.type)}
-                disabled={upgrading === plan.type || subscription?.plan_type === plan.type}
-                className={`w-full py-3 rounded-xl font-bold transition-colors ${
-                  subscription?.plan_type === plan.type
-                    ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-[#ff6b6b] to-[#ff8e53] hover:from-[#ff5252] hover:to-[#ff7b40] text-white'
-                }`}
+                disabled
+                className="w-full py-3 rounded-xl font-bold bg-gray-500 text-gray-200 cursor-not-allowed"
               >
-                {upgrading === plan.type ? '处理中...' :
-                 subscription?.plan_type === plan.type ? '当前计划' : '立即升级'}
+                {subscription?.plan_type === plan.type ? '当前计划' : '支付功能即将开放'}
               </button>
             </div>
           ))}

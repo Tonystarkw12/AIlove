@@ -282,3 +282,7 @@ entities.json
 
 # Docker compose (local deployment)
 docker-compose-nginx.yml
+.repowise/
+.claude/
+.codegraph
+

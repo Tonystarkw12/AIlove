@@ -24,6 +24,8 @@ export function ConsentPage() {
 
   useEffect(() => {
     fetchData();
+    // Initial authenticated fetch only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const authHeaders = { headers: { Authorization: `Bearer ${token}` } };

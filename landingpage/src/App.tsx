@@ -31,8 +31,8 @@ function App() {
     },
     {
       icon: '🛡️',
-      title: '真人验证系统',
-      description: '多层 AI 防伪验证 + 人脸识别技术，确保每个用户都是真实存在的训练师',
+      title: '隐私与真实沟通',
+      description: '联系方式仅在双方同意后交换，减少陌生人直接骚扰',
       color: 'type-steel'
     },
     {
@@ -44,10 +44,10 @@ function App() {
   ]
 
   const stats = [
-    { label: '活跃用户', value: '10,000+', icon: '👥' },
-    { label: '成功匹配', value: '5,000+', icon: '💕' },
-    { label: 'AI 分析次数', value: '100,000+', icon: '🧠' },
-    { label: '用户满意度', value: '98%', icon: '⭐' }
+    { label: 'AI 龙虾代理', value: '自动沟通', icon: '🦞' },
+    { label: '联系方式', value: '双方同意', icon: '🤝' },
+    { label: '匹配维度', value: '兴趣与偏好', icon: '🧠' },
+    { label: '附近优先', value: '地理匹配', icon: '📍' }
   ]
 
   const faqs = [
@@ -57,7 +57,7 @@ function App() {
     },
     {
       question: 'AI 匹配的原理是什么？',
-      answer: '我们使用 Transformer 架构分析用户的兴趣爱好、行为模式和社交偏好，通过协同过滤和内容推荐算法，从数千个特征维度计算匹配度。'
+      answer: '系统结合兴趣标签、价值观、年龄与地理偏好计算基础匹配度，再由 AI 龙虾通过对话评估双方是否值得认识。'
     },
     {
       question: 'AIlove 免费使用吗？',
@@ -65,7 +65,7 @@ function App() {
     },
     {
       question: '如何保证用户安全？',
-      answer: '我们采用多层 AI 防伪验证和人脸识别技术确保用户真实性，同时使用端到端加密保护用户隐私数据。'
+      answer: '联系方式使用加密存储，并且只有双方明确同意后才会交换。请勿在公开资料中填写敏感信息。'
     },
     {
       question: 'AIlove 支持哪些平台？',
@@ -105,14 +105,14 @@ function App() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
-                href="http://loveai.201014.xyz/register"
+                href="https://loveai.201014.xyz/register"
                 className="gameboy-btn bg-[#FFCB05] hover:bg-[#FFB400] text-black font-bold py-4 px-8 rounded-xl text-lg inline-flex items-center gap-2"
               >
                 <span>⚡</span>
                 <span>立即开始</span>
               </a>
               <a
-                href="http://loveai.201014.xyz"
+                href="https://loveai.201014.xyz"
                 className="gameboy-btn bg-[#3B4CCA] hover:bg-[#2A3BA8] text-white font-bold py-4 px-8 rounded-xl text-lg inline-flex items-center gap-2"
               >
                 <span>🎯</span>
@@ -154,6 +154,12 @@ function App() {
                     activeFeature === index ? 'ring-4 ring-[#3B4CCA]' : ''
                   }`}
                   onClick={() => setActiveFeature(index)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setActiveFeature(index);
+                    }
+                  }}
                   role="button"
                   tabIndex={0}
                   aria-label={feature.title}
@@ -291,7 +297,7 @@ function App() {
                 加入 AIlove，让 AI 帮你找到命中注定的那个人
               </p>
               <a
-                href="http://loveai.201014.xyz/register"
+                href="https://loveai.201014.xyz/register"
                 className="gameboy-btn bg-white hover:bg-gray-100 text-[#3B4CCA] font-bold py-4 px-12 rounded-xl text-lg inline-flex items-center gap-2"
               >
                 <span>🚀</span>

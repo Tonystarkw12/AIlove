@@ -51,9 +51,7 @@ export function MusicPlayer({ src, autoPlay = false }: MusicPlayerProps) {
       audio.removeEventListener('canplaythrough', handleCanPlay);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
-      if (isPlaying) {
-        audio.pause();
-      }
+      audio.pause();
     };
   }, [musicSrc, autoPlay]);
 

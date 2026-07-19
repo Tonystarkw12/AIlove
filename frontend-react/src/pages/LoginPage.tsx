@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,7 +9,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login, wechatLogin } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,28 +31,8 @@ export function LoginPage() {
     try {
       await login(email, password);
       navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || '登录失败，请重试');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleWechatLogin = async () => {
-    // For PakePlus mobile app, this will trigger WeChat authorization
-    // In the meantime, simulate a WeChat login for testing
-    const mockCode = 'mock_wechat_code_' + Date.now();
-    const mockUserInfo = {
-      nickName: '微信训练师_' + Math.random().toString(36).substring(7),
-      avatarUrl: '',
-    };
-
-    setIsLoading(true);
-    try {
-      await wechatLogin(mockCode, mockUserInfo);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || '微信登录失败，请重试');
+    } catch (err: unknown) {
+      setError(axios.isAxiosError(err) ? err.response?.data?.error?.message || '登录失败，请重试' : '登录失败，请重试');
     } finally {
       setIsLoading(false);
     }
@@ -109,23 +90,6 @@ export function LoginPage() {
             type="submit"
           />
         </form>
-
-        {/* Divider */}
-        <div className="mt-6 flex items-center gap-3">
-          <div className="flex-1 h-px bg-gray-400" />
-          <span className="text-gray-500 text-sm font-bold">或使用微信登录</span>
-          <div className="flex-1 h-px bg-gray-400" />
-        </div>
-
-        {/* WeChat Login Button */}
-        <button
-          onClick={handleWechatLogin}
-          disabled={isLoading}
-          className="w-full mt-4 py-3 bg-[#07C160] hover:bg-[#06AD56] text-white font-bold rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          <span className="text-xl">📱</span>
-          <span>微信一键登录</span>
-        </button>
 
         {/* Footer */}
         <div className="mt-8 text-center">

@@ -6,6 +6,19 @@ const GEMINI_API_BASE_URL = process.env.GEMINI_API_BASE_URL;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL;
 
+function isValidMatchData(matchData) {
+    return Boolean(matchData)
+        && Number.isInteger(matchData.matchScore)
+        && matchData.matchScore >= 0
+        && matchData.matchScore <= 100
+        && typeof matchData.matchReason === 'string'
+        && matchData.matchReason.length > 0
+        && matchData.matchReason.length <= 200
+        && Array.isArray(matchData.icebreakers)
+        && matchData.icebreakers.length === 3
+        && matchData.icebreakers.every(item => typeof item === 'string' && item.length > 0 && item.length <= 200);
+}
+
 /**
  * Updates recommendations for a given user.
  * This function will be triggered on new user registration or profile update.
@@ -27,7 +40,8 @@ async function updateRecommendationsForUser(userId) {
         // 1. Get the current user's profile and preferences
         const userResult = await client.query(
             `SELECT user_id, nickname, bio, tags, values_description, q_and_a,
-                    location_latitude, location_longitude, location_geohash,
+                    location_latitude, location_longitude, location_geohash, birth_date,
+                    EXTRACT(YEAR FROM AGE(birth_date))::int AS age,
                     preferred_age_min, preferred_age_max, preferred_gender, gender
              FROM users WHERE user_id = $1`,
             [userId]
@@ -64,12 +78,11 @@ async function updateRecommendationsForUser(userId) {
             queryParams.push(currentUser.preferred_age_min, currentUser.preferred_age_max);
         }
         // Filter by users whose age preference includes current user's age
-        if (currentUser.birth_date) {
-            const currentUserAge = new Date().getFullYear() - new Date(currentUser.birth_date).getFullYear();
-             candidatesQuery += ` AND (preferred_age_min IS NULL OR preferred_age_min <= $${paramIndex++})`;
-             queryParams.push(currentUserAge);
-             candidatesQuery += ` AND (preferred_age_max IS NULL OR preferred_age_max >= $${paramIndex++})`;
-             queryParams.push(currentUserAge);
+        if (currentUser.age !== null) {
+            candidatesQuery += ` AND (preferred_age_min IS NULL OR preferred_age_min <= $${paramIndex++})`;
+            queryParams.push(currentUser.age);
+            candidatesQuery += ` AND (preferred_age_max IS NULL OR preferred_age_max >= $${paramIndex++})`;
+            queryParams.push(currentUser.age);
         }
 
 
@@ -148,6 +161,7 @@ async function updateRecommendationsForUser(userId) {
                         response_format: { type: "json_object" } // Request JSON output
                     },
                     {
+                        timeout: 15000,
                         headers: {
                             'Authorization': `Bearer ${GEMINI_API_KEY}`,
                             'Content-Type': 'application/json'
@@ -169,11 +183,11 @@ async function updateRecommendationsForUser(userId) {
                         continue; // Skip this candidate
                     }
 
-                    if (matchData && typeof matchData.matchScore === 'number' && matchData.matchReason && Array.isArray(matchData.icebreakers)) {
+                    if (isValidMatchData(matchData)) {
                         newRecommendations.push({
                             recommending_user_id: userId,
                             recommended_user_id: candidate.user_id,
-                            match_score: parseInt(matchData.matchScore, 10),
+                            match_score: matchData.matchScore,
                             match_reason: matchData.matchReason,
                             icebreakers: matchData.icebreakers,
                             last_calculated: new Date()
@@ -288,6 +302,6 @@ function constructOpenAIUserPrompt(currentUser, candidateUser) {
 }
 
 module.exports = {
+    isValidMatchData,
     updateRecommendationsForUser,
-    // Potentially export constructOpenAIUserPrompt if needed for testing
 };

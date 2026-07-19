@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { HpExpBar } from '../components/HpExpBar';
 import { GameboyButton } from '../components/GameboyButton';
 
 export function HomePage() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4">
@@ -38,8 +40,9 @@ export function HomePage() {
         </p>
         <GameboyButton
           text="开始匹配"
-          subText="消耗50积分"
+          subText="设置龙虾并寻找匹配"
           size="large"
+          onClick={() => navigate('/lobster')}
         />
       </div>
 
