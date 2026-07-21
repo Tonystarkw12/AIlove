@@ -34,18 +34,18 @@ export function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="text-4xl animate-pulse">🦞</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-4 pb-24">
+    <div className="min-h-dvh p-4 pb-24">
       <div className="max-w-md mx-auto pt-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#ff6b6b] to-[#ff8e53] flex items-center justify-center text-4xl text-white font-bold mb-4 shadow-lg">
+          <div className="w-24 h-24 mx-auto rounded-full bg-linear-to-br from-[#ff6b6b] to-[#ff8e53] flex items-center justify-center text-4xl text-white font-bold mb-4 shadow-lg">
             {profile?.nickname?.charAt(0) || user?.nickname?.charAt(0) || '?'}
           </div>
           <h1 className="text-2xl font-bold text-white">

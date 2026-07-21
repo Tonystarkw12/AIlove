@@ -13,7 +13,7 @@
 body {
   font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   background: linear-gradient(180deg, #1a3a5c 0%, #0d1f33 100%);
-  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   color: white;
 }

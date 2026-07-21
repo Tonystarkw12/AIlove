@@ -138,7 +138,7 @@ export function LobsterChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
         <div className="text-2xl animate-pulse text-[#ff6b6b]">加载中...</div>
       </div>
     );
@@ -147,7 +147,7 @@ export function LobsterChatPage() {
   if (selectedChat) {
     const isActive = selectedChat.session_status === 'active' || chatStatus === 'active';
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
         <div className="max-w-md mx-auto pt-4">
           <button
             onClick={() => { setSelectedChat(null); setChatStatus(''); }}
@@ -274,7 +274,7 @@ export function LobsterChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
       <div className="max-w-md mx-auto pt-4">
         <div className="text-center mb-6">
           <div className="text-5xl mb-2">💬</div>

@@ -17,7 +17,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33]">
+      <div className="min-h-dvh flex items-center justify-center bg-linear-to-b from-[#1a3a5c] to-[#0d1f33]">
         <div className="text-4xl animate-pulse">🦞</div>
       </div>
     );
@@ -32,7 +32,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33]">
+    <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33]">
       {children}
       <TabBar />
     </div>

@@ -63,7 +63,7 @@ export function LobsterSkillPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
         <div className="text-2xl animate-pulse text-[#ff6b6b]">加载中...</div>
       </div>
     );
@@ -71,7 +71,7 @@ export function LobsterSkillPage() {
 
   if (noLobster) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
           <div className="text-6xl mb-4">🦞</div>
           <h1 className="text-2xl font-bold text-white mb-3">还没有龙虾</h1>
@@ -90,7 +90,7 @@ export function LobsterSkillPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
       <div className="max-w-2xl mx-auto pt-4">
         {/* Header */}
         <div className="text-center mb-6">

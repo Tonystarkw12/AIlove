@@ -22,7 +22,7 @@ export function HpExpBar({ hp, maxHp, exp, maxExp, showLabels = true }: HpExpBar
         )}
         <div className="h-4 bg-gray-200 rounded-full border-2 border-black overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-red-400 to-red-600 transition-all duration-300"
+            className="h-full bg-linear-to-r from-red-400 to-red-600 transition-all duration-300"
             style={{ width: `${hpPercentage}%` }}
           />
         </div>
@@ -38,7 +38,7 @@ export function HpExpBar({ hp, maxHp, exp, maxExp, showLabels = true }: HpExpBar
         )}
         <div className="h-4 bg-gray-200 rounded-full border-2 border-black overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300"
+            className="h-full bg-linear-to-r from-blue-400 to-blue-600 transition-all duration-300"
             style={{ width: `${expPercentage}%` }}
           />
         </div>

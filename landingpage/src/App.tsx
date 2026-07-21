@@ -74,7 +74,7 @@ function App() {
   ]
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-dvh">
       {/* Hero Section */}
       <header className="relative overflow-hidden">
         {/* Floating Decorations */}
@@ -283,7 +283,7 @@ function App() {
       <section className="py-20" aria-labelledby="cta-heading">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="pokemon-card p-12 bg-gradient-to-br from-[#FFCB05] to-[#FF5A5A]">
+            <div className="pokemon-card p-12 bg-linear-to-br from-[#FFCB05] to-[#FF5A5A]">
               <h2 id="cta-heading" className="text-4xl font-bold mb-4 text-white drop-shadow-lg">
                 准备好了吗？
               </h2>

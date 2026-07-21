@@ -24,7 +24,7 @@
 body {
   font-family: 'Varela Round', 'Nunito', sans-serif;
   background: linear-gradient(180deg, #9BBC0F 0%, #8BAC0F 100%);
-  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
 }
 
