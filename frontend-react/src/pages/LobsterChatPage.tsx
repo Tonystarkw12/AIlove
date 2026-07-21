@@ -83,14 +83,14 @@ export function LobsterChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedChat?.messages]);
 
-  const handleWsMessage = useCallback((msg: any) => {
+  const handleWsMessage = useCallback((msg: Record<string, unknown>) => {
     if (msg.type === 'lobster:message' && msg.chat_id === selectedChat?.chat_id) {
       setSelectedChat(prev => {
         if (!prev) return prev;
         const newMessage: ChatMessage = {
-          sender: msg.sender,
-          content: msg.content,
-          timestamp: msg.timestamp
+          sender: msg.sender as 'a' | 'b' | 'system',
+          content: msg.content as string,
+          timestamp: msg.timestamp as string
         };
         return { ...prev, messages: [...prev.messages, newMessage] };
       });

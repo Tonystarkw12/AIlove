@@ -9,13 +9,13 @@ interface Lobster {
   lobster_id: string;
   owner_id: string;
   name: string;
-  personality_profile: any;
+  personality_profile: Record<string, unknown>;
   avatar_url: string | null;
   status: 'active' | 'paused' | 'suspended';
   total_matches_evaluated: number;
   total_introductions_facilitated: number;
   last_active_at: string;
-  matching_criteria: any;
+  matching_criteria: Record<string, unknown>;
   dealbreakers: string[];
   conversation_style: string;
   lobster_token: string | null;
@@ -48,9 +48,13 @@ export function LobsterPage() {
   const [trialCountdown, setTrialCountdown] = useState('');
   const [showToken, setShowToken] = useState(false);
   const [tokenCopied, setTokenCopied] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
     fetchLobsterData();
+    // Initial authenticated fetch only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Real-time trial countdown
@@ -78,21 +82,24 @@ export function LobsterPage() {
   };
 
   const fetchLobsterData = async () => {
+    setError('');
     try {
-      const [lobsterRes, statsRes, subRes] = await Promise.all([
-        axios.get(`${API_BASE}/lobsters/me`, authHeaders).catch(() => null),
-        axios.get(`${API_BASE}/lobsters/me/stats`, authHeaders).catch(() => null),
-        axios.get(`${API_BASE}/subscriptions/me`, authHeaders).catch(() => null),
-      ]);
+      const lobsterRes = await axios.get(`${API_BASE}/lobsters/me`, authHeaders);
+      setLobster(lobsterRes.data.lobster);
+      setInitialized(Boolean(lobsterRes.data.lobster));
 
-      if (lobsterRes?.data?.lobster) {
-        setLobster(lobsterRes.data.lobster);
-        setInitialized(true);
-      }
-      if (statsRes?.data) setStats(statsRes.data);
-      if (subRes?.data) setSubscription(subRes.data);
+      const [statsRes, subRes] = await Promise.allSettled([
+        axios.get(`${API_BASE}/lobsters/me/stats`, authHeaders),
+        axios.get(`${API_BASE}/subscriptions/me`, authHeaders),
+      ]);
+      if (statsRes.status === 'fulfilled') setStats(statsRes.value.data);
+      if (subRes.status === 'fulfilled') setSubscription(subRes.value.data);
     } catch (err) {
-      console.error('Failed to fetch lobster data:', err);
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
+        setInitialized(false);
+      } else {
+        setError('龙虾数据加载失败，请检查网络后重试');
+      }
     } finally {
       setLoading(false);
     }
@@ -107,8 +114,8 @@ export function LobsterPage() {
         setInitialized(true);
       }
       await fetchLobsterData();
-    } catch (err) {
-      console.error('Failed to initialize lobster:', err);
+    } catch {
+      setError('龙虾激活失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -127,9 +134,13 @@ export function LobsterPage() {
   const triggerMatch = async () => {
     try {
       await axios.post(`${API_BASE}/lobsters/me/match-now`, {}, authHeaders);
-    } catch (err: any) {
-      if (err.response?.status === 402) {
-        alert('订阅已过期，请升级后继续匹配');
+      setNotice('匹配任务已启动，龙虾会在后台寻找合适对象');
+      setError('');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.status === 402) {
+        setError('订阅已过期，请升级后继续匹配');
+      } else {
+        setError('匹配触发失败，请稍后重试');
       }
     }
   };
@@ -242,6 +253,18 @@ export function LobsterPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
       <div className="max-w-md mx-auto pt-4">
+        {/* Error/Notice */}
+        {error && (
+          <div className="bg-red-500/20 border border-red-500/50 text-red-300 p-3 rounded-xl mb-4 text-sm text-center">
+            {error}
+          </div>
+        )}
+        {notice && (
+          <div className="bg-green-500/20 border border-green-500/50 text-green-300 p-3 rounded-xl mb-4 text-sm text-center">
+            {notice}
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-6">
           <div className={`w-20 h-20 mx-auto rounded-full bg-gradient-to-br ${getLobsterAvatar(lobster?.conversation_style)} flex items-center justify-center text-4xl shadow-lg mb-3`}>
