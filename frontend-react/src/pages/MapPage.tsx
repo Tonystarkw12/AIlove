@@ -193,7 +193,7 @@ export function MapPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
       {/* Location Error Display */}
       {locationError && (
         <div className="pokemon-card bg-red-100 border-4 border-red-500 p-4 mb-4">

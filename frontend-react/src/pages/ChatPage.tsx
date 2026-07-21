@@ -107,15 +107,15 @@ export function ChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
+      <div className="min-h-dvh flex items-center justify-center bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F]">
         <div className="text-2xl animate-pulse">加载中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
-      <div className="pokemon-card p-4 h-[calc(100vh-8rem)]">
+    <div className="min-h-dvh bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
+      <div className="pokemon-card p-4 h-[calc(100dvh-8rem)]">
         <h1 className="text-2xl font-bold mb-4">💬 聊天</h1>
 
         <div className="flex h-[calc(100%-3rem)]">

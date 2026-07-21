@@ -39,7 +39,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
+    <div className="min-h-dvh flex items-center justify-center p-4 bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F]">
       <div className="pokemon-card p-8 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">

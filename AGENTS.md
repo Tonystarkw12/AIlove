@@ -105,7 +105,7 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 
 This repository is indexed by Repowise. Use the Repowise MCP tools for codebase orientation, discovery, implementation context, modification risk, design rationale, and cleanup planning. MCP data reflects the last index run; verify against source files before editing.
 
-Last indexed: 2026-07-19 (commit 4b0aab2b). Confidence: 100%.
+Last indexed: 2026-07-19 (commit 0573a473). Confidence: 100%.
 ### Architecture
 I detect documentation-generation intent: high-level onboarding overview, Markdown-only, caveman format. I’m mapping verified entry points and architecture, then I’ll return the requested page only. AIlove consumes user accounts, profiles, preferences, location, subscriptions, and consent decisions; React clients call Express APIs, PostgreSQL/Redis/LLM-backed matching and Lobster-agent workflows transform data into scored recommendations, agent chats, consent-gated introductions, encrypted WeChat exchange, and WebSocket updates. frontend-react/src/main.tsx -> App.tsx -> protected route -> Axios services/api.ts -> /api/*.
 ### Entry Points

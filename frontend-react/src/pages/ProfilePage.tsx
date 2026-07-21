@@ -57,14 +57,14 @@ export function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
+      <div className="min-h-dvh flex items-center justify-center bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F]">
         <div className="text-2xl animate-pulse">加载中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
       {/* Header & Avatar */}
       <div className="pokemon-card p-6 mb-4">
         <div className="flex items-center justify-between mb-4">

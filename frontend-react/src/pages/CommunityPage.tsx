@@ -60,7 +60,7 @@ export function CommunityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
       <div className="pokemon-card p-6 mb-4">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">💕 爱情墙</h1>

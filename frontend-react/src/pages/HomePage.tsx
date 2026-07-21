@@ -8,7 +8,7 @@ export function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4">
+    <div className="min-h-dvh bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F] p-4">
       <div className="pokemon-card p-6 mb-4">
         <h1 className="text-2xl font-bold mb-4">
           欢迎，{user?.nickname || '训练师'}！

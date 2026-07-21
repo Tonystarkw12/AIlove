@@ -62,14 +62,14 @@ export function IntroductionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
         <div className="text-2xl animate-pulse text-[#ff6b6b]">加载中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
       <div className="max-w-md mx-auto pt-4">
         <div className="text-center mb-6">
           <div className="text-5xl mb-2">💌</div>
@@ -91,7 +91,7 @@ export function IntroductionPage() {
             {introductions.map((intro) => (
               <div key={intro.introduction_id} className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/20">
                 <div className="flex items-center mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#ff6b6b] to-[#ff8e53] rounded-full flex items-center justify-center text-2xl mr-3">
+                  <div className="w-12 h-12 bg-linear-to-br from-[#ff6b6b] to-[#ff8e53] rounded-full flex items-center justify-center text-2xl mr-3">
                     {statusEmoji(intro.status)}
                   </div>
                   <div className="flex-1">

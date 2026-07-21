@@ -161,7 +161,7 @@ export function LobsterPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center">
         <div className="text-2xl animate-pulse text-[#ff6b6b]">龙虾加载中...</div>
       </div>
     );
@@ -169,7 +169,7 @@ export function LobsterPage() {
 
   if (error && !initialized) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] flex items-center justify-center p-4">
         <div className="bg-white/10 border border-white/20 rounded-2xl p-6 text-center max-w-md">
           <p role="alert" className="text-[#ff8e8e] mb-4">{error}</p>
           <button onClick={() => { setLoading(true); void fetchLobsterData(); }} className="bg-[#ff6b6b] text-white font-bold py-3 px-6 rounded-xl">
@@ -182,7 +182,7 @@ export function LobsterPage() {
 
   if (!initialized) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4">
+      <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] p-4">
         <div className="max-w-md mx-auto pt-8">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🦞</div>
@@ -232,7 +232,7 @@ export function LobsterPage() {
 
           <button
             onClick={initializeLobster}
-            className="w-full bg-gradient-to-r from-[#ff6b6b] to-[#ff8e53] hover:from-[#ff5252] hover:to-[#ff7b40] text-white font-bold py-4 px-6 rounded-2xl text-lg transition-all shadow-lg"
+            className="w-full bg-linear-to-r from-[#ff6b6b] to-[#ff8e53] hover:from-[#ff5252] hover:to-[#ff7b40] text-white font-bold py-4 px-6 rounded-2xl text-lg transition-all shadow-lg"
           >
             🦞 激活我的龙虾
           </button>
@@ -242,11 +242,11 @@ export function LobsterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#1a3a5c] to-[#0d1f33] p-4 pb-20">
       <div className="max-w-md mx-auto pt-4">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className={`w-20 h-20 mx-auto rounded-full bg-gradient-to-br ${getLobsterAvatar(lobster?.conversation_style)} flex items-center justify-center text-4xl shadow-lg mb-3`}>
+          <div className={`w-20 h-20 mx-auto rounded-full bg-linear-to-br ${getLobsterAvatar(lobster?.conversation_style)} flex items-center justify-center text-4xl shadow-lg mb-3`}>
             🦞
           </div>
           <h1 className="text-2xl font-bold text-white">{lobster?.name || '我的龙虾'}</h1>

@@ -86,14 +86,14 @@ export function PokeballPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F]">
+      <div className="min-h-dvh flex items-center justify-center bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F]">
         <div className="text-2xl animate-pulse">加载中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
+    <div className="min-h-dvh bg-linear-to-b from-[#9BBC0F] to-[#8BAC0F] p-4 pb-20">
       {/* Header */}
       <div className="pokemon-card p-6 mb-4 text-center">
         <h1 className="text-2xl font-bold mb-2">🔮 精灵球商店</h1>
