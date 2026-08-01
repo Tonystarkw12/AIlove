@@ -280,5 +280,10 @@ entities.json
 # Cursor IDE
 .cursor/
 
+# Local code intelligence and generated wiki data
+.devin/
+.repowise/
+deepwiki.json
+
 # Docker compose (local deployment)
 docker-compose-nginx.yml
